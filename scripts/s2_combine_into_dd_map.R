@@ -113,46 +113,70 @@ write.table(pct,paste0(dd_dir,"color_table.txt"),row.names = F,col.names = F,quo
 
 ################################################################################
 #################### Add pseudo color table to result
+################################################################################
 system(sprintf("(echo %s) | oft-addpct.py %s %s",
                paste0(dd_dir,"color_table.txt"),
                paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,".tif"),
                paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"pct.tif")
 ))
 
-
 ################################################################################
 #################### COMPRESS
+################################################################################
 system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
                paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"pct.tif"),
-               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_option1.tif")
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_geo.tif")
 ))
 
-#############################################################
-### CLEAN
+################################################################################
+#################### PROJECT IN UTM 29
+################################################################################
+system(sprintf("gdalwarp -t_srs \"%s\" -ot Byte -co COMPRESS=LZW %s %s",
+               "EPSG:32629",
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_geo.tif"),
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif")
+))
+
+################################################################################
+####################  CLEAN
+################################################################################
 system(sprintf("rm %s",
                paste0(dd_dir,"tmp*.tif")
 ))
 
-(time_decision_tree <- Sys.time() - time_start)
 
+#############################################################
+### ADAPT PRIORITY LANDSCAPE MAPS FOR CROPPING
+#############################################################
+pls <- readOGR(paste0(pl_dir,"Priority_areas.shp"))
+proj4string(pls)
 
+head(pls)
+pl1 <- pls[pls@data$Id == 1,]
+pl2 <- pls[pls@data$Id == 2,]
+
+writeOGR(pl1,paste0(pl_dir,"pl1.shp"),paste0(pl_dir,"pl1"),"ESRI Shapefile",overwrite_layer = T)
+writeOGR(pl2,paste0(pl_dir,"pl2.shp"),paste0(pl_dir,"pl2"),"ESRI Shapefile",overwrite_layer = T)
 
 #############################################################
 ### CROP TO Priority Landscape 1
 system(sprintf("python %s/oft-cutline_crop.py -v %s -i %s -o %s -a %s",
                scriptdir,
-               paste0(gadm_dir,"gadm_",countrycode,"_l1.shp"),
-               gfc_mp,
-               gfc_mp_crop,
-               "OBJECTID"
+               paste0(pl_dir,"pl1.shp"),
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif"),
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm_pl1.tif"),
+               "Id"
 ))
 
 #############################################################
 ### CROP TO Priority Landscape 2
 system(sprintf("python %s/oft-cutline_crop.py -v %s -i %s -o %s -a %s",
                scriptdir,
-               paste0(gadm_dir,"gadm_",countrycode,"_l1.shp"),
-               gfc_mp,
-               gfc_mp_crop,
-               "OBJECTID"
+               paste0(pl_dir,"pl2.shp"),
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif"),
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm_pl2.tif"),
+               "Id"
 ))
+
+
+(time_decision_tree <- Sys.time() - time_start)
