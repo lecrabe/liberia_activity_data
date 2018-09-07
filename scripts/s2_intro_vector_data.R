@@ -13,7 +13,6 @@
 
 ## Get the list of countries from getData: "getData"
 (gadm_list  <- data.frame(getData('ISO3')))
-?getData
 
 ## Get GADM data, check object propreties
 aoi         <- getData('GADM',path=gadm_dir , country= countrycode, level=1)
@@ -47,7 +46,7 @@ writeOGR(aoi_kml,
 levels(as.factor(aoi$NAME_1))
 
 ## Select one province and export as KML
-sub_aoi <- aoi[aoi$NAME_1 == "Kampala",]
+sub_aoi <- aoi[aoi$NAME_1 == "Bomi",]
 
 ## Display the sub-shapefile on top of the previous one, in RED
 plot(sub_aoi,
