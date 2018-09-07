@@ -31,13 +31,37 @@ system(sprintf("python %s/oft-rasterize_attr.py -v %s -i %s -o %s -a %s",
                paste0(gadm_dir,"gadm_",countrycode,"_l1.tif"),
                "ID_1"
 ))
+proj4string(shp)
+
+####################################################################################
+####### PREPARE COMMODITY MAP
+####################################################################################
+shp <- readOGR(paste0(ag_dir,"all_farms_merged.shp"))
+dbf <- shp@data
+dbf$unique_id <- row(dbf)[,1]
+shp@data <- dbf
+shp <- spTransform(shp,CRS('+init=epsg:4326'))
+writeOGR(shp,paste0(ag_dir,"commodities.shp"),paste0(ag_dir,"commodities"),"ESRI Shapefile",overwrite_layer = T)
+head(dbf)
+
+system(sprintf("python %s/oft-rasterize_attr.py -v %s -i %s -o %s -a %s",
+               scriptdir,
+               paste0(ag_dir,"commodities.shp"),
+               paste0(gfc_dir,"gfc_treecover2000.tif"),
+               paste0(ag_dir,"commodities.tif"),
+               "unique_id"
+))
+
+####################################################################################
+####### COMBINE GFC LAYERS
+####################################################################################
 
 #################### CREATE GFC TREE COVER MAP IN 2004 AT THRESHOLD
 system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
                paste0(gfc_dir,"gfc_treecover2000.tif"),
                paste0(gfc_dir,"gfc_lossyear.tif"),
                paste0(dd_dir,"tmp_gfc_2004_gt",gfc_threshold,".tif"),
-               paste0("(A>",gfc_threshold,")*((B==0)+(B>3))")
+               paste0("(A>",gfc_threshold,")*((B==0)+(B>3))*A")
 ))
 
 #################### CREATE GFC LOSS MAP AT THRESHOLD between 2004 and 2014
@@ -62,19 +86,20 @@ system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\
                paste0("(A>0)*(A-B)+(A==0)*(B==1)*0")
 ))
 
-#################### COMBINATION INTO DD MAP
-system(sprintf("gdal_calc.py -A %s -B %s -C %s -D %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
+#################### COMBINATION INTO DD MAP (1==NF, 2==F, 3==Df, 4==Dg, 11==agriculture, 12==HCS_f, 13==HSC_df, 14==HSC_dg)
+system(sprintf("gdal_calc.py -A %s -B %s -C %s -D %s -E %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
                paste0(dd_dir,"tmp_gfc_2004_gt",gfc_threshold,".tif"),
                paste0(dd_dir,"tmp_gfc_loss_0414_gt",gfc_threshold,"_sieve.tif"),
                paste0(dd_dir,"tmp_gfc_loss_0414_gt",gfc_threshold,"_inf.tif"),
                paste0(gadm_dir,"gadm_",countrycode,"_l1.tif"),
+               paste0(ag_dir,"commodities.tif"),
                paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,".tif"),
-               paste0("(D>0)*((A==0)*1+(A>0)*((B==0)*(C==0)*2+(B>0)*3+(C>0)*4))")
+               paste0("(D>0)*((A==0)*1+(A>0)*(E==0)*((B==0)*(C==0)*2+(B>0)*3+(C>0)*4)+(A>60)*(E>0)*((B==0)*(C==0)*12+(B>0)*13+(C>0)*14)+(E>0)*(A<60)*11)")
 ))
 
 #################### CREATE A COLOR TABLE FOR THE OUTPUT MAP
-my_classes <- c(0,1,2,3,4)
-my_colors  <- col2rgb(c("black","grey","darkgreen","red","orange"))
+my_classes <- c(0,1,2,3,4,11,12,13,14)
+my_colors  <- col2rgb(c("black","grey","darkgreen","red","orange","purple","lightgreen","pink","yellow"))
 
 pct <- data.frame(cbind(my_classes,
                         my_colors[1,],
@@ -112,52 +137,8 @@ system(sprintf("rm %s",
 
 
 
-
-
-
-
-#################### CREATE GFC TREE COVER MAP in 2000 AT THRESHOLD
-system(sprintf("gdal_calc.py -A %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-               paste0(gfc_dir,"gfc_treecover2000.tif"),
-               gfc_tc,
-               paste0("(A>",gfc_threshold,")*A")
-))
-
-#################### CREATE GFC TREE COVER LOSS MAP AT THRESHOLD
-system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-               paste0(gfc_dir,"gfc_treecover2000.tif"),
-               paste0(gfc_dir,"gfc_lossyear.tif"),
-               gfc_ly,
-               paste0("(A>",gfc_threshold,")*B")
-))
-
-#################### CREATE GFC FOREST MASK IN 2000 AT THRESHOLD (0 no forest, 1 forest)
-system(sprintf("gdal_calc.py -A %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-               gfc_tc,
-               gfc_00,
-               "A>0"
-))
-
-#################### CREATE GFC FOREST MASK IN 2016 AT THRESHOLD (0 no forest, 1 forest)
-system(sprintf("gdal_calc.py -A %s -B %s -C %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-               gfc_tc,
-               gfc_ly,
-               gfc_gn,
-               gfc_16,
-               "(C==1)*1+(C==0)*((B==0)*(A>0)*1+(B==0)*(A==0)*0+(B>0)*0)"
-))
-
-#################### CREATE MAP 2000-2014 AT THRESHOLD (0 no data, 1 forest, 2 non-forest, 3 loss, 4 gain)
-system(sprintf("gdal_calc.py -A %s -B %s -C %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-               gfc_tc,
-               gfc_ly,
-               gfc_gn,
-               gfc_mp,
-               "(C==1)*4+(C==0)*((B==0)*(A>0)*1+(B==0)*(A==0)*2+(B>0)*(B<15)*3+(B>=15)*1)"
-))
-
 #############################################################
-### CROP TO COUNTRY BOUNDARIES
+### CROP TO Priority Landscape 1
 system(sprintf("python %s/oft-cutline_crop.py -v %s -i %s -o %s -a %s",
                scriptdir,
                paste0(gadm_dir,"gadm_",countrycode,"_l1.shp"),
@@ -167,57 +148,11 @@ system(sprintf("python %s/oft-cutline_crop.py -v %s -i %s -o %s -a %s",
 ))
 
 #############################################################
-### CROP TO ONE STATE BOUNDARIES
-system(sprintf("python %s/oft-cutline_crop.py -v %s -i %s -o %s -a %s",
-               scriptdir,
-               paste0(gadm_dir,"work_aoi_sub.shp"),
-               gfc_mp_crop,
-               gfc_mp_sub,
-               "OBJECTID"
-))
-
-####################################################################################
-####### CLIP ESA MAP TO COUNTRY BOUNDING BOX
-####################################################################################
-system(sprintf("gdal_translate -ot Byte -projwin %s %s %s %s -co COMPRESS=LZW %s %s",
-               floor(bb@xmin),
-               ceiling(bb@ymax),
-               ceiling(bb@xmax),
-               floor(bb@ymin),
-               paste0(esastore_dir,"ESACCI-LC-L4-LC10-Map-20m-P1Y-2016-v1.0.tif"),
-               paste0(esa_dir,"esa.tif")
-))
-
-
-#############################################################
-### CROP TO COUNTRY BOUNDARIES
+### CROP TO Priority Landscape 2
 system(sprintf("python %s/oft-cutline_crop.py -v %s -i %s -o %s -a %s",
                scriptdir,
                paste0(gadm_dir,"gadm_",countrycode,"_l1.shp"),
-               paste0(esa_dir,"esa.tif"),
-               paste0(esa_dir,"esa_crop.tif"),
+               gfc_mp,
+               gfc_mp_crop,
                "OBJECTID"
 ))
-
-#############################################################
-### CROP TO ONE STATE BOUNDARIES
-system(sprintf("python %s/oft-cutline_crop.py -v %s -i %s -o %s -a %s",
-               scriptdir,
-               paste0(gadm_dir,"work_aoi_sub.shp"),
-               paste0(esa_dir,"esa_crop.tif"),
-               paste0(esa_dir,"esa_sub_crop.tif"),
-               "OBJECTID"
-))
-
-#############################################################
-### CREATE A FOREST MASK FOR MSPA ANALYSIS
-system(sprintf("gdal_calc.py -A %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-               paste0(esa_dir,"esa_crop.tif"),
-               paste0(esa_dir,"esa_mspa.tif"),
-               paste0("(A==1)*2+((A==0)+(A==200))*0+((A>1)*(A<200))*1")
-))
-
-
-time_products_global <- Sys.time() - time_start
-
-

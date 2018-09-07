@@ -32,9 +32,10 @@ packages(rgeos)
 packages(ggplot2)
 packages(rgdal)
 packages(dplyr)
+packages(foreign)
 
 ## Set the working directory
-rootdir       <- "~/liberia_activity_data_2018"
+rootdir       <- "~/liberia_activity_data_2018/"
 
 ## Set two downloads directories
 gfcstore_dir  <- "~/downloads/gfc_2016/"
