@@ -15,6 +15,106 @@ time_start  <- Sys.time()
 aoi <- getData('GADM',path=gadm_dir, country= countrycode, level=1)
 bb <- extent(aoi)
 
+writeOGR(aoi,
+         paste0(gadm_dir,"gadm_",countrycode,"_l1.shp"),
+         paste0("gadm_",countrycode,"_l1"),
+         "ESRI Shapefile",
+         overwrite_layer = T)
+
+head(read.dbf(paste0(gadm_dir,"gadm_",countrycode,"_l1.dbf")))
+
+#################### Create a country boundary mask at the GFC resolution (TO BE REPLACED BY NATIONAL DATA IF AVAILABLE) 
+system(sprintf("python %s/oft-rasterize_attr.py -v %s -i %s -o %s -a %s",
+               scriptdir,
+               paste0(gadm_dir,"gadm_",countrycode,"_l1.shp"),
+               paste0(gfc_dir,"gfc_treecover2000.tif"),
+               paste0(gadm_dir,"gadm_",countrycode,"_l1.tif"),
+               "ID_1"
+))
+
+#################### CREATE GFC TREE COVER MAP IN 2004 AT THRESHOLD
+system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
+               paste0(gfc_dir,"gfc_treecover2000.tif"),
+               paste0(gfc_dir,"gfc_lossyear.tif"),
+               paste0(dd_dir,"tmp_gfc_2004_gt",gfc_threshold,".tif"),
+               paste0("(A>",gfc_threshold,")*((B==0)+(B>3))")
+))
+
+#################### CREATE GFC LOSS MAP AT THRESHOLD between 2004 and 2014
+system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
+               paste0(gfc_dir,"gfc_treecover2000.tif"),
+               paste0(gfc_dir,"gfc_lossyear.tif"),
+               paste0(dd_dir,"tmp_gfc_loss_0414_gt",gfc_threshold,".tif"),
+               paste0("(A>",gfc_threshold,")*(B>3)*(B<15)")
+))
+
+#################### SIEVE TO THE MMU
+system(sprintf("gdal_sieve.py -st 12 %s %s ",
+               paste0(dd_dir,"tmp_gfc_loss_0414_gt",gfc_threshold,".tif"),
+               paste0(dd_dir,"tmp_gfc_loss_0414_gt",gfc_threshold,"_sieve.tif")
+))
+
+#################### DIFFERENCE BETWEEN SIEVED AND ORIGINAL
+system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
+               paste0(dd_dir,"tmp_gfc_loss_0414_gt",gfc_threshold,".tif"),
+               paste0(dd_dir,"tmp_gfc_loss_0414_gt",gfc_threshold,"_sieve.tif"),
+               paste0(dd_dir,"tmp_gfc_loss_0414_gt",gfc_threshold,"_inf.tif"),
+               paste0("(A>0)*(A-B)+(A==0)*(B==1)*0")
+))
+
+#################### COMBINATION INTO DD MAP
+system(sprintf("gdal_calc.py -A %s -B %s -C %s -D %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
+               paste0(dd_dir,"tmp_gfc_2004_gt",gfc_threshold,".tif"),
+               paste0(dd_dir,"tmp_gfc_loss_0414_gt",gfc_threshold,"_sieve.tif"),
+               paste0(dd_dir,"tmp_gfc_loss_0414_gt",gfc_threshold,"_inf.tif"),
+               paste0(gadm_dir,"gadm_",countrycode,"_l1.tif"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,".tif"),
+               paste0("(D>0)*((A==0)*1+(A>0)*((B==0)*(C==0)*2+(B>0)*3+(C>0)*4))")
+))
+
+#################### CREATE A COLOR TABLE FOR THE OUTPUT MAP
+my_classes <- c(0,1,2,3,4)
+my_colors  <- col2rgb(c("black","grey","darkgreen","red","orange"))
+
+pct <- data.frame(cbind(my_classes,
+                        my_colors[1,],
+                        my_colors[2,],
+                        my_colors[3,]))
+
+write.table(pct,paste0(dd_dir,"color_table.txt"),row.names = F,col.names = F,quote = F)
+
+
+
+
+################################################################################
+#################### Add pseudo color table to result
+system(sprintf("(echo %s) | oft-addpct.py %s %s",
+               paste0(dd_dir,"color_table.txt"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,".tif"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"pct.tif")
+))
+
+
+################################################################################
+#################### COMPRESS
+system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"pct.tif"),
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_option1.tif")
+))
+
+#############################################################
+### CLEAN
+system(sprintf("rm %s",
+               paste0(dd_dir,"tmp*.tif")
+))
+
+(time_decision_tree <- Sys.time() - time_start)
+
+
+
+
+
+
 
 #################### CREATE GFC TREE COVER MAP in 2000 AT THRESHOLD
 system(sprintf("gdal_calc.py -A %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
