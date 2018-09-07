@@ -1,0 +1,65 @@
+####################################################################################################
+####################################################################################################
+## Set environment variables
+## Contact remi.dannunzio@fao.org 
+## 2018/05/04
+####################################################################################################
+####################################################################################################
+
+####################################################################################################
+options(stringsAsFactors = FALSE)
+
+### Load necessary packages
+library(raster)
+library(rgeos)
+library(ggplot2)
+library(rgdal)
+library(dplyr)
+
+## Set the working directory
+rootdir      <- "/media/dannunzio/OSDisk/Users/dannunzio/Documents/countries/liberia/"
+gfcstore_dir <- "/media/dannunzio/lecrabe/gis_data/gfc_hansen_umd/gfc_2016/"
+#esastore_dir <- "/media/dannunzio/lecrabe/gis_data/esa_cci_maps/ESACCI-LC-L4-LC10-Map-20m-P1Y-2016-v1.0/"
+countrycode  <- "LBR"
+
+setwd(rootdir)
+rootdir <- paste0(getwd(),"/")
+
+scriptdir<- paste0(rootdir,"scripts/")
+data_dir <- paste0(rootdir,"data/")
+gadm_dir <- paste0(rootdir,"data/gadm/")
+gfc_dir  <- paste0(rootdir,"data/gfc/")
+dd_dir   <- paste0(rootdir,"data/dd_map/")
+lc_dir   <- paste0(rootdir,"data/forest_mask/")
+tile_dir <- paste0(rootdir,"data/tiling/")
+tab_dir  <- paste0(rootdir,"data/tables/")
+
+#lsat_dir <- paste0(rootdir,"data/mosaic_lsat/")
+#seg_dir  <- paste0(rootdir,"data/segments/")
+#esa_dir  <- paste0(rootdir,"data/esa/")
+
+dir.create(data_dir,showWarnings = F)
+dir.create(gadm_dir,showWarnings = F)
+dir.create(gfc_dir,showWarnings = F)
+dir.create(dd_dir,showWarnings = F)
+dir.create(lc_dir,showWarnings = F)
+dir.create(gfcstore_dir,showWarnings = F)
+dir.create(tile_dir,showWarnings = F)
+
+#dir.create(lsat_dir,showWarnings = F)
+#dir.create(seg_dir,showWarnings = F)
+#dir.create(esa_folder,showWarnings = F)
+#dir.create(esa_dir,showWarnings = F)
+
+#################### GFC PRODUCTS
+gfc_threshold <- 30
+
+#################### PRODUCTS AT THE THRESHOLD
+gfc_tc       <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_tc.tif")
+gfc_ly       <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_ly.tif")
+gfc_gn       <- paste0(gfc_dir,"gfc_gain.tif")
+gfc_16       <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_F_2016.tif")
+gfc_00       <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_F_2000.tif")
+gfc_mp       <- paste0(gfc_dir,"gfc_map_2000_2014_th",gfc_threshold,".tif")
+gfc_mp_crop  <- paste0(gfc_dir,"gfc_map_2000_2014_th",gfc_threshold,"_crop.tif")
+gfc_mp_sub   <- paste0(gfc_dir,"gfc_map_2000_2014_th",gfc_threshold,"_sub_crop.tif")
