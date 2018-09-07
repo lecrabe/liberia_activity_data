@@ -31,9 +31,10 @@ The aim of the processing chain is to combine GFC dataset, with an agricultural 
 In SEPAL, open a terminal and start an instance #4 or #6 (the higher the better)
 
 Clone the repository with the following command:
+
 ``` git clone https://github.com/lecrabe/liberia_activity_data_2018.git ```
 
-Open another SEPAL tab, go to Process/rstudio and under the clone directory, open and run the following scripts:
+Open another SEPAL tab, go to Process/rstudio and under the clone directory, open and ``` source()``` the following scripts:
 
 ##### s0_parameters.R
 This script needs to be run EVERY TIME your R session is restarted. 
@@ -57,9 +58,17 @@ This script will combine the different layers to produce a DD map
 
 The corresponding decision tree is represented below:
 
-![Alt text](/illustrations/decision_tree_option_1.jpeg?raw=true "Decision tree")
+![Alt text](/docs/decision_tree_option_1.jpeg?raw=true "Decision tree")
 
 It takes ~5 min to run with an instance #6 
 
+The final map is cropped to the boundaries of the priority landscapes:
 
+![Alt text](/docs/dd_map_cropped.png?raw=true "PL crop")
+
+##### Accuracy assessment of the maps
+Each map (priority landscape 1 and 2, rest of the country) is sampled using the SAE-design tool inside SEPAL
+
+The specific instructions to run the aa_xxx scripts are available in attachment
+ 
 
