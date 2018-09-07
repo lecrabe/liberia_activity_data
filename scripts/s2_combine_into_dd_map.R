@@ -40,10 +40,12 @@ shp <- readOGR(paste0(ag_dir,"all_farms_merged.shp"))
 dbf <- shp@data
 dbf$unique_id <- row(dbf)[,1]
 shp@data <- dbf
-shp <- spTransform(shp,CRS('+init=epsg:4326'))
-writeOGR(shp,paste0(ag_dir,"commodities.shp"),paste0(ag_dir,"commodities"),"ESRI Shapefile",overwrite_layer = T)
-head(dbf)
 
+shp <- spTransform(shp,CRS('+init=epsg:4326'))
+
+writeOGR(shp,paste0(ag_dir,"commodities.shp"),paste0(ag_dir,"commodities"),"ESRI Shapefile",overwrite_layer = T)
+
+head(shp)
 system(sprintf("python %s/oft-rasterize_attr.py -v %s -i %s -o %s -a %s",
                scriptdir,
                paste0(ag_dir,"commodities.shp"),
@@ -137,12 +139,7 @@ system(sprintf("gdalwarp -t_srs \"%s\" -ot Byte -co COMPRESS=LZW %s %s",
                paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif")
 ))
 
-################################################################################
-####################  CLEAN
-################################################################################
-system(sprintf("rm %s",
-               paste0(dd_dir,"tmp*.tif")
-))
+
 
 
 #############################################################
@@ -150,33 +147,98 @@ system(sprintf("rm %s",
 #############################################################
 pls <- readOGR(paste0(pl_dir,"Priority_areas.shp"))
 proj4string(pls)
-
 head(pls)
-pl1 <- pls[pls@data$Id == 1,]
-pl2 <- pls[pls@data$Id == 2,]
 
-writeOGR(pl1,paste0(pl_dir,"pl1.shp"),paste0(pl_dir,"pl1"),"ESRI Shapefile",overwrite_layer = T)
-writeOGR(pl2,paste0(pl_dir,"pl2.shp"),paste0(pl_dir,"pl2"),"ESRI Shapefile",overwrite_layer = T)
-
-#############################################################
-### CROP TO Priority Landscape 1
-system(sprintf("python %s/oft-cutline_crop.py -v %s -i %s -o %s -a %s",
+#################### RASTERIZE THE PRIORITY LANDSCAPE
+system(sprintf("python %s/oft-rasterize_attr.py -v %s -i %s -o %s -a %s",
                scriptdir,
-               paste0(pl_dir,"pl1.shp"),
+               paste0(pl_dir,"Priority_areas.shp"),
                paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif"),
-               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm_pl1.tif"),
+               paste0(pl_dir,"Priority_areas.tif"),
                "Id"
 ))
 
-#############################################################
-### CROP TO Priority Landscape 2
-system(sprintf("python %s/oft-cutline_crop.py -v %s -i %s -o %s -a %s",
-               scriptdir,
-               paste0(pl_dir,"pl2.shp"),
+#################### MASK MAP FOR PRIORITY LANDSCAPE 1
+system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
                paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif"),
-               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm_pl2.tif"),
-               "Id"
+               paste0(pl_dir,"Priority_areas.tif"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_pl1.tif"),
+               paste0("(B==1)*A")
 ))
 
+#################### MASK MAP FOR PRIORITY LANDSCAPE 2
+system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif"),
+               paste0(pl_dir,"Priority_areas.tif"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_pl2.tif"),
+               paste0("(B==2)*A")
+))
+
+#################### MASK MAP FOR NON PRIORITY LANDSCAPE
+system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif"),
+               paste0(pl_dir,"Priority_areas.tif"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_npl.tif"),
+               paste0("(B==0)*A")
+))
+
+
+################################################################################
+#################### Add pseudo color table to result
+################################################################################
+system(sprintf("(echo %s) | oft-addpct.py %s %s",
+               paste0(dd_dir,"color_table.txt"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_pl1.tif"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_pl1_pct.tif")
+))
+
+################################################################################
+#################### COMPRESS
+################################################################################
+system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_pl1_pct.tif"),
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm_pl1.tif")
+))
+
+################################################################################
+#################### Add pseudo color table to result
+################################################################################
+system(sprintf("(echo %s) | oft-addpct.py %s %s",
+               paste0(dd_dir,"color_table.txt"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_pl2.tif"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_pl2_pct.tif")
+))
+
+################################################################################
+#################### COMPRESS
+################################################################################
+system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_pl2_pct.tif"),
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm_pl2.tif")
+))
+
+################################################################################
+#################### Add pseudo color table to result
+################################################################################
+system(sprintf("(echo %s) | oft-addpct.py %s %s",
+               paste0(dd_dir,"color_table.txt"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_npl.tif"),
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_npl_pct.tif")
+))
+
+################################################################################
+#################### COMPRESS
+################################################################################
+system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
+               paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_npl_pct.tif"),
+               paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm_npl.tif")
+))
+
+################################################################################
+####################  CLEAN
+################################################################################
+system(sprintf("rm %s",
+               paste0(dd_dir,"tmp*.tif")
+))
 
 (time_decision_tree <- Sys.time() - time_start)
