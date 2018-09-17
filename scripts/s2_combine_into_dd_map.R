@@ -12,24 +12,24 @@ time_start  <- Sys.time()
 ####################################################################################
 ####### GET COUNTRY BOUNDARIES
 ####################################################################################
-aoi <- getData('GADM',path=gadm_dir, country= countrycode, level=1)
-bb <- extent(aoi)
-
-writeOGR(aoi,
-         paste0(gadm_dir,"gadm_",countrycode,"_l1.shp"),
-         paste0("gadm_",countrycode,"_l1"),
-         "ESRI Shapefile",
-         overwrite_layer = T)
-
-head(read.dbf(paste0(gadm_dir,"gadm_",countrycode,"_l1.dbf")))
+# aoi <- getData('GADM',path=gadm_dir, country= countrycode, level=1)
+# bb <- extent(aoi)
+# 
+# writeOGR(aoi,
+#          paste0(gadm_dir,"gadm_",countrycode,"_l1.shp"),
+#          paste0("gadm_",countrycode,"_l1"),
+#          "ESRI Shapefile",
+#          overwrite_layer = T)
+# 
+# head(read.dbf(paste0(gadm_dir,"gadm_",countrycode,"_l1.dbf")))
 
 #################### Create a country boundary mask at the GFC resolution (TO BE REPLACED BY NATIONAL DATA IF AVAILABLE) 
 system(sprintf("python %s/oft-rasterize_attr.py -v %s -i %s -o %s -a %s",
                scriptdir,
-               paste0(gadm_dir,"gadm_",countrycode,"_l1.shp"),
+               paste0(gadm_dir,"county_lisgis_0516.shp"),
                paste0(gfc_dir,"gfc_treecover2000.tif"),
-               paste0(gadm_dir,"gadm_",countrycode,"_l1.tif"),
-               "ID_1"
+               paste0(gadm_dir,"county_lisgis_0516.tif"),
+               "OBJECTID"
 ))
 proj4string(shp)
 
@@ -145,23 +145,23 @@ system(sprintf("gdalwarp -t_srs \"%s\" -ot Byte -co COMPRESS=LZW %s %s",
 #############################################################
 ### ADAPT PRIORITY LANDSCAPE MAPS FOR CROPPING
 #############################################################
-pls <- readOGR(paste0(pl_dir,"Priority_areas.shp"))
+pls <- readOGR(paste0(pl_dir,"priority_areas_counties.shp"))
 proj4string(pls)
 head(pls)
 
 #################### RASTERIZE THE PRIORITY LANDSCAPE
 system(sprintf("python %s/oft-rasterize_attr.py -v %s -i %s -o %s -a %s",
                scriptdir,
-               paste0(pl_dir,"Priority_areas.shp"),
+               paste0(pl_dir,"priority_areas_counties.shp"),
                paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif"),
-               paste0(pl_dir,"Priority_areas.tif"),
-               "Id"
+               paste0(pl_dir,"priority_areas_counties.tif"),
+               "id"
 ))
 
 #################### MASK MAP FOR PRIORITY LANDSCAPE 1
 system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
                paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif"),
-               paste0(pl_dir,"Priority_areas.tif"),
+               paste0(pl_dir,"priority_areas_counties.tif"),
                paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_pl1.tif"),
                paste0("(B==1)*A")
 ))
@@ -169,7 +169,7 @@ system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\
 #################### MASK MAP FOR PRIORITY LANDSCAPE 2
 system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
                paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif"),
-               paste0(pl_dir,"Priority_areas.tif"),
+               paste0(pl_dir,"priority_areas_counties.tif"),
                paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_pl2.tif"),
                paste0("(B==2)*A")
 ))
@@ -177,7 +177,7 @@ system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\
 #################### MASK MAP FOR NON PRIORITY LANDSCAPE
 system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
                paste0(dd_dir,"dd_map_0414_gt",gfc_threshold,"_utm.tif"),
-               paste0(pl_dir,"Priority_areas.tif"),
+               paste0(pl_dir,"priority_areas_counties.tif"),
                paste0(dd_dir,"tmp_dd_map_0414_gt",gfc_threshold,"_utm_npl.tif"),
                paste0("(B==0)*A")
 ))
