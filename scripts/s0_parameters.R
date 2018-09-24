@@ -44,6 +44,8 @@ gfcstore_dir  <- "~/downloads/gfc_2016/"
 ## Set the country code
 countrycode <- "LBR"
 
+
+
 ## Go to the root directory
 setwd(rootdir)
 rootdir <- paste0(getwd(),"/")
@@ -78,8 +80,9 @@ dir.create(pl_dir,showWarnings = F)
 # dir.create(seg_dir,showWarnings = F)
 # dir.create(tile_dir,showWarnings = F)
 
-#################### GFC PRODUCTS
-gfc_threshold <- 30
+#################### FOREST DEFINITION
+gfc_threshold <- 30 # in % Tree cover
+mmu <- 12           # in pixels 
 
 #################### PRODUCTS AT THE THRESHOLD
 gfc_tc       <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_tc.tif")
