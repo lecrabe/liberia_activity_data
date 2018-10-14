@@ -54,7 +54,7 @@ This script will combine the different layers to produce a DD map
 
 The corresponding decision tree is represented below:
 
-![Alt text](/docs/decision_tree_option_1.jpeg?raw=true "Decision tree")
+![Alt text](/docs/decision_tree_20181014.jpeg?raw=true "Decision tree")
 
 It takes ~5 min to run with an instance #6 
 
