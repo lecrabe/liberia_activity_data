@@ -24,7 +24,7 @@ The aim of the processing chain is to combine GFC dataset, with an agricultural 
 12: Trees outside forest
 
 ### How to run the processing chain
-In SEPAL, open a terminal and start an instance #4 or #6 (the higher the better)
+In SEPAL, open a terminal and start an instance #4 
 
 Clone the repository with the following command:
 
@@ -47,7 +47,7 @@ This script needs to be run ONCE.
 
 It will download the necessary data tiles from [GFC repository](https://earthenginepartners.appspot.com/science-2013-global-forest/download_v1.5.html) merge tiles together and clip it to the boundaing boxes of your AOI
 
-It takes ~20 min to run with an instance #6 
+It takes ~20 min to run with an instance #4 
 
 ##### s2_combine_into_dd_map_v3.R
 This script will combine the different layers to produce a DD map
@@ -56,7 +56,7 @@ The corresponding decision tree is represented below:
 
 ![Alt text](/docs/decision_tree_20181014.jpeg?raw=true "Decision tree")
 
-It takes ~5 min to run with an instance #6 
+It takes ~5 min to run with an instance #4 
 
 The final map is cropped to the boundaries of the priority landscapes:
 
