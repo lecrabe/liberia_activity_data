@@ -49,12 +49,12 @@ It will download the necessary data tiles from [GFC repository](https://eartheng
 
 It takes ~20 min to run with an instance #6 
 
-##### s2_combine_into_dd_map.R
+##### s2_combine_into_dd_map_v3.R
 This script will combine the different layers to produce a DD map
 
 The corresponding decision tree is represented below:
 
-![Alt text](/docs/decision_tree_option_1.jpeg?raw=true "Decision tree")
+![Alt text](/docs/decision_tree_20181014.jpeg?raw=true "Decision tree")
 
 It takes ~5 min to run with an instance #6 
 
