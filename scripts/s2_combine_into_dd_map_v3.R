@@ -47,7 +47,7 @@ system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\
                paste0(gfc_dir,"gfc_treecover2000.tif"),
                paste0(gfc_dir,"gfc_lossyear.tif"),
                paste0(dd_dir,"tmp_gfc_loss_0716_gt",gfc_threshold,".tif"),
-               paste0("(A>",gfc_threshold,")*(B>6)")
+               paste0("(A>",gfc_threshold,")*(B>6)*(B<16)")
 ))
 
 #################### SIEVE TO THE MMU
@@ -71,7 +71,7 @@ system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\
                paste0(dd_dir,"tmp_gfc_2007_gt",gfc_threshold,".tif"),
                paste0(gfc_dir,"gfc_lossyear.tif"),
                paste0(dd_dir,"tmp_gfc_2016_gt",gfc_threshold,".tif"),
-               paste0("(A>0)*((B>=15)+(B==0))")
+               paste0("(A>0)*((B>=16)+(B==0))")
 ))
 
 
