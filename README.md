@@ -4,11 +4,11 @@ The material on this repo has been developed to run inside SEPAL (https://sepal.
 The aim of the processing chain is to combine GFC dataset, with an agricultural commodity layer and a priority landscape layer to produce a deforestation and degradation map.
 
 ### Characteristics of the output
-- Period for 2004-2014
+- Period for 2007-2016
 
 - 30% canopy cover threshold for the forest definition
 
-- 1ha threshold for separation of tree cover loss between deforestation and degradation
+- 1ha threshold for separation of tree cover loss between deforestation and degradation, and of tree cover between forest and trees outside forest
 
 #### Legend
 1: Non Forest
@@ -21,11 +21,7 @@ The aim of the processing chain is to combine GFC dataset, with an agricultural 
 
 11: Agricultural commodities
 
-12: HCS >60% TC 
-
-13: Deforestation HCS >60% TC 
-
-14: Degradation HCS >60% TC 
+12: Trees outside forest
 
 ### How to run the processing chain
 In SEPAL, open a terminal and start an instance #4 or #6 (the higher the better)
@@ -64,7 +60,7 @@ It takes ~5 min to run with an instance #6
 
 The final map is cropped to the boundaries of the priority landscapes:
 
-![Alt text](/docs/dd_map_cropped.png?raw=true "PL crop")
+![Alt text](/docs/dd_map_cropped_20181014.png?raw=true "PL crop")
 
 ##### Accuracy assessment of the maps
 Each map (priority landscape 1 and 2, rest of the country) is sampled using the SAE-design tool inside SEPAL
