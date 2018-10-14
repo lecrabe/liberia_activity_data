@@ -42,14 +42,14 @@ The first time it runs, it can take a few minutes as the necessary packages may 
 Once it has run the first time, it takes a few seconds and initializes everything.
 
 
-##### s1_download_gfc_2016_v3.R
+##### s1_download_gfc_2016.R
 This script needs to be run ONCE.
 
 It will download the necessary data tiles from [GFC repository](https://earthenginepartners.appspot.com/science-2013-global-forest/download_v1.5.html) merge tiles together and clip it to the boundaing boxes of your AOI
 
 It takes ~20 min to run with an instance #6 
 
-##### s2_combine_into_dd_map.R
+##### s2_combine_into_dd_map_v3.R
 This script will combine the different layers to produce a DD map
 
 The corresponding decision tree is represented below:
