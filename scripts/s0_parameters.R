@@ -33,6 +33,8 @@ packages(ggplot2)
 packages(rgdal)
 packages(dplyr)
 packages(foreign)
+packages(reshape2)
+packages(survey)
 
 ## Set the working directory
 rootdir       <- "~/liberia_activity_data_2018/"
@@ -43,8 +45,6 @@ gfcstore_dir  <- "~/downloads/gfc_2016/"
 
 ## Set the country code
 countrycode <- "LBR"
-
-
 
 ## Go to the root directory
 setwd(rootdir)
@@ -58,6 +58,11 @@ dd_dir   <- paste0(rootdir,"data/dd_map/")
 lc_dir   <- paste0(rootdir,"data/forest_mask/")
 ag_dir   <- paste0(rootdir,"data/farms/")
 pl_dir   <- paste0(rootdir,"data/priority_landscapes/")
+ref_dir  <- paste0(rootdir,"data/reference_data/")
+samp_dir <- paste0(rootdir,"data/samples/")
+coll_dir <- paste0(ref_dir,'collected_samples/')
+ana_dir  <- paste0(ref_dir,'analysis/')
+plot_dir <- paste0(ana_dir,'plots/')
 
 #tile_dir <- paste0(rootdir,"data/tiling/")
 #tab_dir  <- paste0(rootdir,"data/tables/")
@@ -73,6 +78,10 @@ dir.create(dd_dir,showWarnings = F)
 dir.create(lc_dir,showWarnings = F)
 dir.create(ag_dir,showWarnings = F)
 dir.create(pl_dir,showWarnings = F)
+dir.create(ref_dir,showWarnings = F)
+dir.create(samp_dir,showWarnings = F)
+dir.create(ana_dir,showWarnings = F)
+dir.create(plot_dir,showWarnings = F)
 
 # dir.create(esastore_dir,showWarnings = F)
 # dir.create(esa_dir,showWarnings = F)
