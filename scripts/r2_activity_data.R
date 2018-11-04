@@ -17,8 +17,8 @@ national_strata_areas <- read.csv(paste0(samp_dir,'national_strata_change_areas.
 
 ### need a column with strata areas for each priority area...
 ### also can have national level 
-
-allref1 <- merge(allref,all_strata_areas, by='strata_pl')
+?merge
+allref1 <- base::merge(allref,all_strata_areas, by='strata_pl')
 table(allref1$strata_pl)
 table(allref1$map_area)
 
@@ -37,13 +37,12 @@ svytotal(~change ,srs_design)
 strat_srs_design <- svydesign(ids=~1,  strata=~strata_pl,
                               fpc=~map_area, weights=~map_weights, data=allref1)
 svyby(~change, ~strata_pl_label, strat_srs_design, svymean,keep.var = T, vartype = 'ci')
-table(allref1.s$strata_pl_label,allref1$lu_t1_f)
+table(allref1$strata_pl_label,allref1$lu_t1_f)
 allref1.sub <- allref1[allref1$change %in% 'FNF',]
 table(allref1$change_label)
 nrow(allref1.sub)
 table(allref1.sub$strata_pl_label,allref1.sub$lu_t1_f)
 head(allref1)
-lu_t1_f
 table(allref1$lu_t1_f)
 allref1.nona <- allref1[!allref1$lu_t1_f %in% "",]
 nrow(allref1.nona)
@@ -59,8 +58,8 @@ svytotal(~change_pl ,strat_srs_design)
 df.results.strat_srs_design <- as.data.frame(svymean(~change_pl,strat_srs_design))
 df.results.strat_srs_design$mean_m <-df.results.strat_srs_design$mean * totalarea 
 df.results.strat_srs_design$CI <-df.results.strat_srs_design$SE * 1.96 
-df.results.strat_srs_design$CI_ha <-df.results.strat_srs_design$SE * 1.96  * totalarea
-df.results.strat_srs_design$CI_percent <- df.results.strat_srs_design$CI_ha/df.results.strat_srs_design$mean_ha
+df.results.strat_srs_design$CI_m <-df.results.strat_srs_design$SE * 1.96  * totalarea
+df.results.strat_srs_design$CI_percent <- df.results.strat_srs_design$CI_m/df.results.strat_srs_design$mean_m
 df.results.strat_srs_design
 
 
@@ -76,7 +75,7 @@ df.results$CI_m <-df.results$SE * 1.96  * totalarea
 df.results
 
 
-write.csv(df.results,'oromia_area_CI.csv',row.names = F)
+# write.csv(df.results,'oromia_area_CI.csv',row.names = F)
 # ######################## plotting the data
 
 
@@ -96,3 +95,4 @@ table(allref$change,allref$year_change)
 table(allref$change,allref$map_class_label)
 table(allref$change,allref$region)
 table(allref$change,allref$shifting_yrs)
+

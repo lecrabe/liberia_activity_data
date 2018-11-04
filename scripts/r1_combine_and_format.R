@@ -69,6 +69,7 @@ table(dup$NFNF)
 allref <- mg[!duplicated(mg$id_nonunique),]
 # read priority area raster file
 pa <- raster(priorityareasfile)
+pa.shp <- readOGR(paste0(pl_dir,"priority_areas_20181014.shp"))
 # convert dataframe into spatial points data frame 
 coord <- coordinates(allref[,c('location_x','location_y')])
 coord.sp <- SpatialPoints(coord)
@@ -77,7 +78,10 @@ coord.spdf <- SpatialPointsDataFrame(coord.sp, coord.df,proj4string=CRS("+proj=l
 proj4string(coord.spdf) <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 #match the coordinate systems for the sample points and the boundaries
 coord.spdf.UTM <- spTransform(coord.spdf, crs(pa))
-allref$priorityarea <- raster::extract(pa, coord.spdf)
+allref$priorityarea <- raster::extract(pa, coord.spdf.UTM)
+# pa.shp.coord <- over(coord.spdf.UTM, pa.shp)
+# allref$priorityarea <- pa.shp.coord[,3]
+# allref$priorityarea[is.na(allref$priorityarea)] <- 0
 table(allref$priorityarea,allref$samp)
 allref[is.na(allref)] <- ""
 
@@ -92,6 +96,7 @@ all_strata_areas$strata_pl <- paste0(all_strata_areas$map_code,all_strata_areas$
 all_strata_areas$strata_pl_label <- paste(all_strata_areas$map_edited_class,all_strata_areas$priority_area_label,sep = '_')
 # calculate strata weights
 all_strata_areas$map_weights<-all_strata_areas$map_area/sum(unique(all_strata_areas$map_area))
+write.csv(all_strata_areas,paste0(samp_dir,'all_strata_areas.csv'),row.names = F)
 
 ##############################
 # create an strata area dataframe for national level calculations
