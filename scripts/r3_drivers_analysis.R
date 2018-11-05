@@ -9,7 +9,6 @@
 
 ## read data
 source('~/liberia_activity_data_2018/scripts/s0_parameters.R')
-
 allref <- read.csv(paste0(ref_dir,'all_reference_data.csv'))
 
 # quick stats on degraded forest

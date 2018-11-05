@@ -20,8 +20,8 @@ point_file <- list.files(coll_dir, glob2rx("*.csv"), full.names = T)
 myfiles <- lapply(point_file, read.csv)
 rd <- do.call(rbind, myfiles)
 ## read the sample data without iterpretations
-samp <- read.csv(originalsampledata)
-samp1 <- samp[c(1,12:14)]
+sample_data <- read.csv(originalsampledata)
+sample_data1 <- sample_data[c(1,12:14)]
 
 ## reclassify agricultural commidities to nonforest
 rd$map_class[rd$map_class %in% 11] <- 1
@@ -30,13 +30,16 @@ rd$map_class_label[rd$map_class %in% 1] <- 'NFNF'
 rd$map_class_label[rd$map_class %in% 2] <- 'FF'
 rd$map_class_label[rd$map_class %in% 3] <- 'FNF'
 rd$map_class_label[rd$map_class %in% 4] <- 'Fd'
+## check the table
 table(rd$map_class_label,rd$change)
 
+#####################################
+## seperate out duplicates
 ## merge data from orginal sample data and collected database to get information about duplicated plots
-mg <- merge(rd,samp1, by='id', all.x=T)
+df <- merge(rd,sample_data1, by='id', all.x=T)
 ## create a nonunique ID to find duplicated samples
-mg$id_nonunique <- str_replace_all(mg$id_unique,"dup","")
-nonunique <- mg[mg$db_double %in% 'TRUE',]
+df$id_nonunique <- str_replace_all(df$id_unique,"dup","")
+nonunique <- df[df$db_double %in% 'TRUE',]
 
 ## write duplicates to a CSV
 write.csv(nonunique,paste0(ref_dir,'duplicate_samples_liberia.csv'),row.names = FALSE)
@@ -46,43 +49,84 @@ dup.match <- dup %>%
   filter(Fd == 2 | FF == 2 | FNF == 2 | NFNF == 2)
 dup.nonmatch <- dup %>% 
   filter(Fd == 1 | FF == 1 | FNF == 1 | NFNF == 1)
-mg.nonmatch <- mg[mg$id_nonunique %in% dup.nonmatch$id_nonunique,]
-mg.nonmatch.nodup <- mg.nonmatch[!duplicated(mg.nonmatch$id_nonunique),]
-samp_recheck <- samp[samp$id %in% mg.nonmatch.nodup$id,]
+df.nonmatch <- df[df$id_nonunique %in% dup.nonmatch$id_nonunique,]
+df.nonmatch.nodup <- df.nonmatch[!duplicated(df.nonmatch$id_nonunique),]
+## visualize the disagreements in tables
+## make sure each nonunique ID is repeated. it should have a value of 2 or greater 
+head(table(df.nonmatch$id_nonunique))
+## check the low/high confidence classifications of nonmatching duplicates
+table(df.nonmatch$conf_change)
+
+## assess which operators have checked which nonmatching duplicates
+## this can be used to reassign the samples to another operator
+operator <- dcast(df.nonmatch[,c('id_nonunique','operator')], id_nonunique  ~ operator  ,value.var = 'operator',fill=0)
+# this is the full database of all the matching duplicated samples
+df.match <- df[df$id_nonunique %in% dup.match$id_nonunique,]
+## further exploring the data, show the classification of the land use at time 1 for forest and time 2 for nonforest by activity data classification
+table.df.nonmatch <- dcast(df.nonmatch[,c('id_nonunique','lu_t2_nf','lu_t1_f','change')], id_nonunique  ~ lu_t1_f + lu_t2_nf ,value.var = 'change',fill=0)
+table.df.nonmatch
+## write the operator of nonmatching duplicates to CSV file
+write.csv(operator,paste0(ref_dir,'operator_nonmatch.csv'),row.names = F)
+
+###########################
+## CREATE INPUT FOR COLLECT EARTH
+## THIS IS THE FILE TO RECHECK OF UNMATCHING DUPLICATES
+samp_recheck <- sample_data[sample_data$id %in% df.nonmatch.nodup$id,]
+## the file name is "~/liberia_activity_data_2018/data/reference_data/recheck_QA_samples.csv"
 write.csv(samp_recheck,paste0(ref_dir,'recheck_QA_samples.csv'),row.names = FALSE)
 
-table(mg.nonmatch$id_nonunique)
-table(mg.nonmatch$conf_change)
-op <- dcast(mg.nonmatch[,c('id_nonunique','operator')], id_nonunique  ~ operator  ,value.var = 'operator',fill=0)
-mg.match <- mg[mg$id_nonunique %in% dup.match$id_nonunique,]
-test <- dcast(mg.nonmatch[,c('id_nonunique','lu_t2_nf','lu_t1_f','change')], id_nonunique  ~ lu_t1_f + lu_t2_nf ,value.var = 'change',fill=0)
-
-write.csv(op,paste0(ref_dir,'operator_nonmatch.csv'),row.names = F)
 ## check the data
 head(dup)
+nrow(dup[dup$Fd %in%1,])
 table(dup$Fd)
 table(dup$FF)
 table(dup$FNF)
 table(dup$NFNF)
 
-# eliminate duplicate plots, these are not yet filtered to find the majority classification
-allref <- mg[!duplicated(mg$id_nonunique),]
-# read priority area raster file
+## some information that could be useful for reporting
+paste0('To check interpreter error ', nrow(dup), ' samples, ', 
+       sprintf("%.0f%%", 100 * nrow(dup)/nrow(df[!duplicated(df$id_nonunique),])),
+       ' of the total samples were duplicated. ')
+paste0('The activity data had a consistent classification for ',nrow(dup.match), 
+       ' of the ', nrow(dup), ' (',sprintf("%.0f%%", 100 * nrow(dup.match)/nrow(dup)),') duplicated samples.')
+paste0('The activity data had an inconsistent classification for ',nrow(dup.nonmatch), 
+       ' of the ', nrow(dup), ' (',sprintf("%.0f%%", 100 * nrow(dup.nonmatch)/nrow(dup)),') duplicated samples.')
+paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$Fd %in% c(1,2),]), 
+       ' samples were classified as degradation by at least one interpreter. ', 
+       nrow(dup[dup$Fd %in% c(1),]), ' were nonmatching and ', nrow(dup[dup$Fd %in% c(2),]),
+       ' were matching.')
+paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$FF %in% c(1,2),]), 
+       ' samples were classified as stable forest by at least one interpreter. ', 
+       nrow(dup[dup$FF %in% c(1),]), ' were nonmatching and ', nrow(dup[dup$FF %in% c(2),]),
+       ' were matching.')
+paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$NFNF %in% c(1,2),]), 
+       ' samples were classified as stable non-forest by at least one interpreter. ', 
+       nrow(dup[dup$NFNF %in% c(1),]), ' were nonmatching and ', nrow(dup[dup$NFNF %in% c(2),]),
+       ' were matching.')
+paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$FNF %in% c(1,2),]), 
+       ' samples were classified as deforestation by at least one interpreter. ', 
+       nrow(dup[dup$FNF %in% c(1),]), ' were nonmatching and ', nrow(dup[dup$FNF %in% c(2),]),
+       ' were matching.')
+
+## eliminate duplicate plots, these are not yet filtered to find the majority classification
+allref <- df[!duplicated(df$id_nonunique),]
+## read priority area raster file
 pa <- raster(priorityareasfile)
-pa.shp <- readOGR(paste0(pl_dir,"priority_areas_20181014.shp"))
-# convert dataframe into spatial points data frame 
+# pa.shp <- readOGR(paste0(pl_dir,"priority_areas_20181014.shp"))
+## convert dataframe into spatial points data frame 
 coord <- coordinates(allref[,c('location_x','location_y')])
 coord.sp <- SpatialPoints(coord)
 coord.df <- as.data.frame(coord)
 coord.spdf <- SpatialPointsDataFrame(coord.sp, coord.df,proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 proj4string(coord.spdf) <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
-#match the coordinate systems for the sample points and the boundaries
+##match the coordinate systems for the sample points and the boundaries
 coord.spdf.UTM <- spTransform(coord.spdf, crs(pa))
 allref$priorityarea <- raster::extract(pa, coord.spdf.UTM)
 # pa.shp.coord <- over(coord.spdf.UTM, pa.shp)
 # allref$priorityarea <- pa.shp.coord[,3]
 # allref$priorityarea[is.na(allref$priorityarea)] <- 0
-table(allref$priorityarea,allref$samp)
+table(allref$priorityarea,allref$sample_data)
+## format dataframe to not have NA values
 allref[is.na(allref)] <- ""
 
 
@@ -126,8 +170,10 @@ npl <- allref[allref$priorityarea %in% 0,]
 pl1 <- allref[allref$priorityarea %in% 1,]
 pl2 <- allref[allref$priorityarea %in% 2,]
 
+##############################################################
+## FINAL COMBINED DATABASES OF ASSESSED REFERENCE DATA
+## THESE ARE INPUT INTO THE SAEA APPLICATION (STRATIFIED AREA ESTIMATOR ANALYSIS)
 # write the dataframes to a CSV
-
 write.csv(allref,paste0(ref_dir,'all_reference_data.csv'),row.names = FALSE)
 write.csv(npl,paste0(ref_dir,'npl_reference_data.csv'),row.names = FALSE)
 write.csv(pl1,paste0(ref_dir,'pl1_reference_data.csv'),row.names = FALSE)
