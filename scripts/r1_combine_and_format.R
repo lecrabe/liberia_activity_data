@@ -90,30 +90,35 @@ table(dup$FF)
 table(dup$FNF)
 table(dup$NFNF)
 
+# Start writing to an output file
+sink(paste0(ana_dir,'analysis-output.txt'))
 ## some information that could be useful for reporting
-paste0('To check interpreter error ', nrow(dup), ' samples, ', 
+cat(paste0('To check interpreter error ', nrow(dup), ' samples, ', 
        sprintf("%.0f%%", 100 * nrow(dup)/nrow(df[!duplicated(df$id_nonunique),])),
-       ' of the total samples were duplicated. ')
-paste0('The activity data had a consistent classification for ',nrow(dup.match), 
-       ' of the ', nrow(dup), ' (',sprintf("%.0f%%", 100 * nrow(dup.match)/nrow(dup)),') duplicated samples.')
-paste0('The activity data had an inconsistent classification for ',nrow(dup.nonmatch), 
-       ' of the ', nrow(dup), ' (',sprintf("%.0f%%", 100 * nrow(dup.nonmatch)/nrow(dup)),') duplicated samples.')
-paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$Fd %in% c(1,2),]), 
+       ' of the total samples were duplicated. \n'))
+cat(paste0('The activity data had a consistent classification for ',nrow(dup.match), 
+       ' of the ', nrow(dup), ' (',sprintf("%.0f%%", 100 * nrow(dup.match)/nrow(dup)),') duplicated samples. \n'))
+cat(paste0('The activity data had an inconsistent classification for ',nrow(dup.nonmatch), 
+       ' of the ', nrow(dup), ' (',sprintf("%.0f%%", 100 * nrow(dup.nonmatch)/nrow(dup)),') duplicated samples.\n'))
+cat(paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$Fd %in% c(1,2),]), 
        ' samples were classified as degradation by at least one interpreter. ', 
        nrow(dup[dup$Fd %in% c(1),]), ' were nonmatching and ', nrow(dup[dup$Fd %in% c(2),]),
-       ' were matching.')
-paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$FF %in% c(1,2),]), 
+       ' were matching.\n'))
+cat(paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$FF %in% c(1,2),]), 
        ' samples were classified as stable forest by at least one interpreter. ', 
        nrow(dup[dup$FF %in% c(1),]), ' were nonmatching and ', nrow(dup[dup$FF %in% c(2),]),
-       ' were matching.')
-paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$NFNF %in% c(1,2),]), 
+       ' were matching.\n'))
+cat(paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$NFNF %in% c(1,2),]), 
        ' samples were classified as stable non-forest by at least one interpreter. ', 
        nrow(dup[dup$NFNF %in% c(1),]), ' were nonmatching and ', nrow(dup[dup$NFNF %in% c(2),]),
-       ' were matching.')
-paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$FNF %in% c(1,2),]), 
+       ' were matching.\n'))
+cat(paste0('From the nonmatching duplicated samples, ',nrow(dup[dup$FNF %in% c(1,2),]), 
        ' samples were classified as deforestation by at least one interpreter. ', 
        nrow(dup[dup$FNF %in% c(1),]), ' were nonmatching and ', nrow(dup[dup$FNF %in% c(2),]),
-       ' were matching.')
+       ' were matching.\n'))
+
+# Stop writing to the file
+sink()
 
 ## eliminate duplicate plots, these are not yet filtered to find the majority classification
 allref <- df[!duplicated(df$id_nonunique),]

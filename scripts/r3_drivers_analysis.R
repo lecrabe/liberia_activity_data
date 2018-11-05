@@ -118,3 +118,15 @@ ggplot(data = melted_def, aes(x=Var1, y=Var2)) +
   xlab("Forest type") + ylab("Driver of deforestation") +
   labs(fill = "# of samples")
 dev.off()
+
+
+## append text outputs to analysis text file
+sink(paste0(ana_dir,'analysis-output.txt'), append=TRUE)
+cat(' \n ____________________________________________________________________________ \n \n')
+cat(' \n DRIVERS OF FOREST DEGRADATION AND DEFORESTATION \n ')
+cat(paste('Forest degraded between 2007 and 2016 orginally was',sprintf("%.0f%%", 100 * prop.table(tab_degraded)),colnames(tab_degraded),'\n', sep = ' '))
+cat(paste('The main disturbance of forest degraded between 2007 and 2016 was',sprintf("%.0f%%", 100 * prop.table(tab_degraded_disturb)),colnames(tab_degraded_disturb),'\n', sep = ' '))
+cat(paste('Deforestation between 2007 and 2016 orginally was',sprintf("%.0f%%", 100 * prop.table(tab_deforest_t1)),colnames(tab_deforest_t1),'\n', sep = ' '))
+cat(paste('Deforestation between 2007 and 2016 was forest converted into',sprintf("%.0f%%", 100 * prop.table(tab_deforest_t2)),colnames(tab_deforest_t2), '\n',sep = ' '))
+# Stop writing to the file
+sink()
