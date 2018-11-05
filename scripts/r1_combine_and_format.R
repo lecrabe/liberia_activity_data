@@ -75,6 +75,13 @@ samp_recheck <- sample_data[sample_data$id %in% df.nonmatch.nodup$id,]
 ## the file name is "~/liberia_activity_data_2018/data/reference_data/recheck_QA_samples.csv"
 write.csv(samp_recheck,paste0(ref_dir,'recheck_QA_samples.csv'),row.names = FALSE)
 
+## LOW CONFINDENCE CHANGE CLASS
+table(df$conf_change)
+df.low.confid <- df[df$conf_change %in% 'low',] 
+df.low.confid <- df.low.confid[!df.low.confid$id %in% df.nonmatch.nodup$id,]
+samp_recheck.low.confid <- sample_data[sample_data$id %in% df.low.confid$id,]
+write.csv(samp_recheck.low.confid,paste0(ref_dir,'recheck_QA_samples_low_confidence.csv'),row.names = FALSE)
+
 ## check the data
 head(dup)
 nrow(dup[dup$Fd %in%1,])
