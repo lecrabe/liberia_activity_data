@@ -35,6 +35,7 @@ packages(dplyr)
 packages(foreign)
 packages(reshape2)
 packages(survey)
+packages(stringr)
 
 ## Set the working directory
 rootdir       <- "~/liberia_activity_data_2018/"
