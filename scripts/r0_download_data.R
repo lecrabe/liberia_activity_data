@@ -18,3 +18,6 @@ system(sprintf("rm %s",paste0(ref_dir,'collected_samples.zip')))
 
 ## download the strata areas by priority landscape
 system(sprintf("wget -O %s  https://www.dropbox.com/s/mh9i8jyp76nteru/all_strata_areas.csv", paste0(samp_dir,'all_strata_areas.csv')))
+
+## download the rechecked reference data
+system(sprintf("wget -O %s  https://www.dropbox.com/s/ziksn3h14wu3srf/group_recheck_QA_samples_collectedData_earthliberia_aa_frel_20180313_on_061118_232308_CSV.csv?dl=0", paste0(ref_dir,'group_rechecked_duplicates_20181107.csv')))

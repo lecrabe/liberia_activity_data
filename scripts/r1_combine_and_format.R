@@ -2,7 +2,7 @@
 ####################################################################################################
 ## CLEAN REFERENCE DATA AND PREPARE FOR ANALYSIS 
 ## Contact yelena.finegold@fao.org
-## 2018/10/29
+## 2018/11/07
 ## r1_combine_and_format.R
 ####################################################################################################
 ####################################################################################################
@@ -14,6 +14,7 @@
 source('~/liberia_activity_data_2018/scripts/s0_parameters.R')
 originalsampledata <- paste0(samp_dir,'all_sample_points.csv')
 priorityareasfile <- paste0(pl_dir,'priority_areas_20181014.tif')
+### READ RECHECKED DATA ## AMENDED 07/11/2018
 
 ## read data collected by operators from Collect Earth
 point_file <- list.files(coll_dir, glob2rx("*.csv"), full.names = T)
