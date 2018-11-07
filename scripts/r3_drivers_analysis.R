@@ -25,6 +25,7 @@ png(paste0(plot_dir,'pie_degraded_t1.png'))
 pie(tab_degraded, labels = lbls, 
     main=paste0("Original forest types of degraded forest", "\n", 'Sample size: ',sum(tab_degraded) ))
 dev.off()
+dev.off()
 
 # disturbances of degraded forest...
 tab_degraded_disturb <- table(allref$change[allref$change %in% 'Fd'],allref$disturbance_type.1.[allref$change %in% 'Fd'])
@@ -38,6 +39,7 @@ pie(tab_degraded_disturb, labels = lbls,
 png(paste0(plot_dir,'pie_degraded_t2.png'))
 pie(tab_degraded_disturb, labels = lbls, 
     main=paste0("Primary disturbances of degraded forest", "\n", 'Sample size: ',sum(tab_degraded_disturb) ))
+dev.off()
 dev.off()
 
 # table of drivers of degradation by forest type
@@ -66,6 +68,7 @@ ggplot(data = melted_deg, aes(x=Var1, y=Var2)) +
   xlab("Forest type") + ylab("Driver of degradation") +
   labs(fill = "# of samples")
 dev.off()
+dev.off()
 
 ########################################################
 # quick stats on deforestation
@@ -80,6 +83,7 @@ pie(tab_deforest_t1, labels = lbls,
 png(paste0(plot_dir,'pie_deforest_t1.png'))
 pie(tab_deforest_t1, labels = lbls, 
     main=paste0("Drivers of deforestation in Liberia", "\n", 'Sample size: ',sum(tab_deforest_t1) ))
+dev.off()
 dev.off()
 
 # drivers of deforestation
@@ -130,3 +134,4 @@ cat(paste('Deforestation between 2007 and 2016 orginally was',sprintf("%.0f%%", 
 cat(paste('Deforestation between 2007 and 2016 was forest converted into',sprintf("%.0f%%", 100 * prop.table(tab_deforest_t2)),colnames(tab_deforest_t2), '\n',sep = ' '))
 # Stop writing to the file
 sink()
+
