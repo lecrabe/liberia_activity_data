@@ -2,7 +2,7 @@
 ####################################################################################################
 ## ACTIVITY DATA CALCULATION
 ## Contact yelena.finegold@fao.org
-## 2018/10/29
+## 2018/11/07
 ## r2_activity_data.R
 ####################################################################################################
 ####################################################################################################
@@ -35,7 +35,6 @@ strat_srs_design <- svydesign(ids=~1,  strata=~strata_pl,
 svyby(~change, ~strata_pl_label, strat_srs_design, svymean,keep.var = T, vartype = 'ci')
 
 svymean(~change ,strat_srs_design)
-?round
 svytotal(~change_pl ,strat_srs_design)
 table(allref1$change_pl)
 # calculate area and CI per class (for STRATIFIED random sampling design)
@@ -121,7 +120,7 @@ dev.off()
 ######################################################################################
 allref2 <- base::merge(allref,national_strata_areas,by.x="map_class_label", by.y='map_edited_class')
 national_strat_srs_design <- svydesign(ids=~1,  strata=~strata_pl,
-                              fpc=~map_area, weights=~map_weights, data=allref2)
+                                       fpc=~map_area, weights=~map_weights, data=allref2)
 
 svymean(~change ,national_strat_srs_design)
 table(allref2$change)
@@ -135,11 +134,11 @@ df.results.national_strat_srs_design$CI_percent <- round(df.results.national_str
 df.results.national_strat_srs_design$strata <- 'none'
 df.results.national_strat_srs_design <-df.results.national_strat_srs_design[3:ncol(df.results.national_strat_srs_design)]
 
-nat_ad <-ddply(df.results.strat_srs_design,.(change),summarize,
-               area_m=sum(area_m), CI_m=sum(CI_m)
-               # ,
-               # samplesize=sum(samplesize)
-               )
+nat_ad <-plyr::ddply(df.results.strat_srs_design, .(change), plyr::summarize,
+                     area_m=sum(area_m), CI_m=sum(CI_m)
+                     # ,
+                     # samplesize=sum(samplesize)
+)
 names(nat_ad)[1] <- 'class'
 nat_ad$CI_percent <- round(nat_ad$CI_m/nat_ad$area_m,digits = 3)
 nat_ad$strata <- 'PL'
