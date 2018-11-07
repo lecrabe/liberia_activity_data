@@ -21,3 +21,9 @@ system(sprintf("wget -O %s  https://www.dropbox.com/s/mh9i8jyp76nteru/all_strata
 
 ## download the rechecked reference data
 system(sprintf("wget -O %s  https://www.dropbox.com/s/ziksn3h14wu3srf/group_recheck_QA_samples_collectedData_earthliberia_aa_frel_20180313_on_061118_232308_CSV.csv?dl=0", paste0(ref_dir,'group_rechecked_duplicates_20181107.csv')))
+
+## download area for each priority area
+system(sprintf("wget -O %s  https://www.dropbox.com/s/b5jvyz4cw5gc910/area_rast.zip", paste0(dd_dir,'area_rast.zip')))
+system(sprintf("unzip -o %s  -d %s ",paste0(dd_dir,'area_rast.zip'),paste0(dd_dir,'area_rast/')))
+system(sprintf("rm %s",paste0(dd_dir,'area_rast.zip')))
+system(sprintf("cp %s %s",paste0(dd_dir,'area_rast/area_rast_EDIT_pl1.csv'),paste0(dd_dir,'sae_design_dd_map_0716_gt30_utm_pl1_20181014/')))
