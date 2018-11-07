@@ -37,6 +37,7 @@ packages(foreign)
 packages(reshape2)
 packages(survey)
 packages(stringr)
+packages(tidyr)
 
 ## Set the working directory
 rootdir       <- "~/liberia_activity_data_2018/"
