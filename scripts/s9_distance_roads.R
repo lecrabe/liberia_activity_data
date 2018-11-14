@@ -23,7 +23,7 @@ system(sprintf("ogr2ogr -t_srs \"%s\" %s %s",
 system(sprintf("python %s  -v %s -i %s -o %s -a %s",
                paste0(scriptdir,"oft-rasterize_attr.py"),
                paste0(rdsdir,"lbr_trs_roads_osm_utm.shp"),
-               paste0(dd_dir,"dd_map_0716_gt30_utm_pl1_20181014.tif"),
+               paste0(dd_dir,"dd_map_0716_gt30_utm_20181014.tif"),
                paste0(rdsdir,"lbr_trs_roads_osm_30m.tif"),
                "fclass"
 ))
