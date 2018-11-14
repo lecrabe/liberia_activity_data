@@ -5,21 +5,25 @@
 ## LIBERIA
 ####################################################################################################
 ####################################################################################################
+
+##################### Roads downloaded from https://geonode.wfp.org/layers/ogcserver.gis.wfp.org%3Ageonode%3Albr_trs_roads_osm
 download.file("http://ogcserver.gis.wfp.org/geoserver/ows?format_options=charset:UTF-8&typename=geonode:lbr_trs_roads_osm&outputFormat=SHAPE-ZIP&version=1.0.0&service=WFS&request=GetFeature",
               destfile = paste0(rdsdir,"roads.zip"))
 
+##################### Unzip archive
 system(sprintf("unzip -o %s  -d %s ",
                paste0(rdsdir,"roads.zip"),
                rdsdir
                ))
 
+##################### Reproject in UTM
 system(sprintf("ogr2ogr -t_srs \"%s\" %s %s",
                "EPSG:32629",
                paste0(rdsdir,"lbr_trs_roads_osm_utm.shp"),
                paste0(rdsdir,"lbr_trs_roads_osm.shp")
 ))
 
-
+##################### Rasterize at dd_map resolution
 system(sprintf("python %s  -v %s -i %s -o %s -a %s",
                paste0(scriptdir,"oft-rasterize_attr.py"),
                paste0(rdsdir,"lbr_trs_roads_osm_utm.shp"),
@@ -28,13 +32,21 @@ system(sprintf("python %s  -v %s -i %s -o %s -a %s",
                "fclass"
 ))
 
+##################### Calculate distance to road
 system(sprintf("gdal_proximity.py -co COMPRESS=LZW  -distunits GEO -ot Int16 %s %s",
                paste0(rdsdir,"lbr_trs_roads_osm_30m.tif"),
                paste0(rdsdir,"dist_roads.tif")
 ))
 
 
-##################### Clip to real extent
+#################### Discretize distance to main roads
+system(sprintf("gdal_calc.py -A %s --type=Byte  --overwrite --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
+               paste0(rdsdir,"dist_roads.tif"),
+               paste0(rdsdir,"dist_roads_km.tif"),
+               "A/1000"
+))
+
+##################### Clip dd maps to real extent
 system(sprintf("gdal_translate -projwin %s %s %s %s -co COMPRESS=LZW %s %s",
                212781.792683,
                951995.137653,
@@ -62,12 +74,6 @@ system(sprintf("gdal_translate -projwin %s %s %s %s -co COMPRESS=LZW %s %s",
                paste0(dd_dir,"dd_npl.tif")
 ))
 
-#################### Discretize distance to main roads
-system(sprintf("gdal_calc.py -A %s --type=Byte  --overwrite --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-               paste0(rdsdir,"dist_roads.tif"),
-               paste0(rdsdir,"dist_roads_km.tif"),
-               "A/1000"
-))
 
 #################### ALIGN PRODUCTS PL1
 input  <- paste0(rdsdir,"dist_roads_km.tif")
