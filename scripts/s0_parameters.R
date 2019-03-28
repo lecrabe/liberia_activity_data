@@ -59,7 +59,7 @@ lc_dir   <- paste0(rootdir,"data/forest_mask/")
 ag_dir   <- paste0(rootdir,"data/farms/")
 pl_dir   <- paste0(rootdir,"data/priority_landscapes/")
 
-#tile_dir <- paste0(rootdir,"data/tiling/")
+tile_dir <- paste0(rootdir,"data/tiling/")
 #tab_dir  <- paste0(rootdir,"data/tables/")
 # esa_dir  <- paste0(rootdir,"data/esa/")
 # lsat_dir <- paste0(rootdir,"data/mosaic_lsat/")
@@ -78,7 +78,7 @@ dir.create(pl_dir,showWarnings = F)
 # dir.create(esa_dir,showWarnings = F)
 # dir.create(lsat_dir,showWarnings = F)
 # dir.create(seg_dir,showWarnings = F)
-# dir.create(tile_dir,showWarnings = F)
+ dir.create(tile_dir,showWarnings = F)
 
 #################### FOREST DEFINITION
 gfc_threshold <- 30 # in % Tree cover
@@ -93,3 +93,22 @@ gfc_04       <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_F_2000.tif")
 gfc_mp       <- paste0(gfc_dir,"gfc_map_2000_2014_th",gfc_threshold,".tif")
 gfc_mp_crop  <- paste0(gfc_dir,"gfc_map_2000_2014_th",gfc_threshold,"_crop.tif")
 gfc_mp_sub   <- paste0(gfc_dir,"gfc_map_2000_2014_th",gfc_threshold,"_sub_crop.tif")
+
+############ CREATE A FUNCTION TO GENERATE REGULAR GRIDS
+generate_grid <- function(aoi,size){
+  ### Create a set of regular SpatialPoints on the extent of the created polygons  
+  sqr <- SpatialPoints(makegrid(aoi,offset=c(-0.5,-0.5),cellsize = size))
+  
+  ### Convert points to a square grid
+  grid <- points2grid(sqr)
+  
+  ### Convert the grid to SpatialPolygonDataFrame
+  SpP_grd <- as.SpatialPolygons.GridTopology(grid)
+  
+  sqr_df <- SpatialPolygonsDataFrame(Sr=SpP_grd,
+                                     data=data.frame(rep(1,length(SpP_grd))),
+                                     match.ID=F)
+  ### Assign the right projection
+  proj4string(sqr_df) <- proj4string(aoi)
+  sqr_df
+}
