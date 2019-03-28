@@ -1,0 +1,11 @@
+Num,plot_location_x,plot_location_y,cluster_cluster_plot_no,plot_type,stand_description_land_use_class,stand_description_land_use_class2,stand_description_successional_status,stand_description_forest_type,point_category
+1,570876,596468,SN_CP_047,EP,F,F_pr,P,EVE,Primary protected forest
+2,600524,647924,GG_CP_090,EP,F,F_timb,P,EVE,Primary forest with timber extraction
+3,501460,613566,SN_CP_057,EP,F,F_fal,SO,EVE,Forest Fallow
+4,273873.9281,733981.4576,BM_CP_150,EP,F,F_com,SY,EVE,Community Forest 
+5,491563.0544,699246.4762,NB_CP_131,EP,C,C_coc,,,Cropland Cocoa
+6,362905,716550,MGB_CP_139,EP,C,C_rub,,,Cropland Rubber
+7,640447.45,510874.2963,ML_CP_005,EP,C,C_oilp,SY,SEM,Cropland oil palm
+8,373386.7954,939357.8108,LF_CP_283,EP,C,C_mix,,,Cropland mixed
+9,343016.3721,682322.6681,MGB_CP_107,EP,Grass,,,,Grassland
+10,580880.4218,510795.3202,GK_CP_002,EP,Wet,,,,Wetland
