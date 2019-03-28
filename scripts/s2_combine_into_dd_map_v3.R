@@ -90,7 +90,7 @@ system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\
                paste0("(A>0)*(A-B)+(A==0)*(B==1)*0")
 ))
 
-#################### COMBINATION INTO DD MAP (1==NF, 2==F, 3==Df, 4==Dg, 11==agriculture, 12==trees outside forest)
+#################### COMBINATION INTO DD MAP (1==NF, 2==F, 3==Df, 4==Dg, 11==agriculture)
 system(sprintf("gdal_calc.py -A %s -B %s -C %s -D %s -E %s -F %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
                paste0(dd_dir,"tmp_gfc_2007_gt",gfc_threshold,".tif"),
                paste0(dd_dir,"tmp_gfc_loss_0716_gt",gfc_threshold,"_sieve.tif"),
@@ -99,7 +99,7 @@ system(sprintf("gdal_calc.py -A %s -B %s -C %s -D %s -E %s -F %s --co COMPRESS=L
                paste0(dd_dir,"tmp_gfc_2016_gt",gfc_threshold,"_sieve.tif"),
                paste0(dd_dir,"tmp_gfc_2016_gt",gfc_threshold,"_inf.tif"),
                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,".tif"),
-               paste0("(A==0)*1+(A>0)*(D==0)*((B==0)*(C==0)*((E>0)*2+(F>0)*12)+(B>0)*3+(C>0)*4)+(A>0)*(D>0)*11")
+               paste0("(A==0)*1+(A>0)*(D==0)*((B==0)*(C==0)*((E>0)*2+(F>0)*1)+(B>0)*3+(C>0)*4)+(A>0)*(D>0)*11")
 ))
 
 ################################################################################
@@ -129,8 +129,8 @@ system(sprintf("gdal_calc.py -A %s -B %s  --co COMPRESS=LZW --outfile=%s --calc=
 ))
 
 #################### CREATE A COLOR TABLE FOR THE OUTPUT MAP
-my_classes <- c(0,1,2,3,4,11,12)
-my_colors  <- col2rgb(c("black","grey","darkgreen","red","orange","purple","lightgreen"))
+my_classes <- c(0,1,2,3,4,11)
+my_colors  <- col2rgb(c("black","grey","darkgreen","red","orange","purple"))
 
 pct <- data.frame(cbind(my_classes,
                         my_colors[1,],

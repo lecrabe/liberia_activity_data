@@ -66,5 +66,19 @@ The final map is cropped to the boundaries of the priority landscapes:
 Each map (priority landscape 1 and 2, rest of the country) is sampled using the SAE-design tool inside SEPAL
 
 The specific instructions to run the aa_xxx scripts are available in attachment
- 
 
+Formatting of the reference data and additional analyses can be carried out using the r_x scripts. Each of the scripts can be run using the source() button in RStudio. 
+
+##### r0_download_data.R
+This script needs to be run ONCE.
+It will download the reference data needed to do to the analysis.
+
+##### r1_combine_and_format.R
+This script formats, cleans and provides a quick analysis on duplicated sapmles.
+If the reference data is updated this script can be rerun
+
+##### r2_activity_data.R
+This script is the R script version of the SAEA application in SEPAL 
+
+##### r3_drivers_analysis.R
+This script outputs some figures for drivers of deforestation and forest degradation. 
