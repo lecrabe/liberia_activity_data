@@ -39,12 +39,23 @@ aoi_geo <- spTransform(aoi,CRS("+init=epsg:4326"))
 plot(tiles)
 plot(aoi_geo,add=T,border="blue")
 
-### Export X random tiles TILE as KML
-x <- 1
-ex_tile <- tiles[sample(1:nrow(tiles@data),1)+seq(1,x,1),]
+
+### Call the pilot sites file
+df <- read.csv(paste0(data_dir,"Liberia_Bfast_sample_locations.csv"))
+spdf <- SpatialPointsDataFrame(df[,c("plot_location_x","plot_location_y")],
+                               data = df,
+                               proj4string = CRS('+init=epsg:32629')
+                                )
+
+pts <- spTransform(spdf,CRS('+init=epsg:4326'))
+plot(pts,add=T)
+
+### Export pilot tiles as KML
+x <- "pilot"
+ex_tile <- tiles[pts,]
 plot(ex_tile,add=T,col="red")
 
-export_name <- paste0("ex_",x,"tiles")
+export_name <- paste0("ex_",x,"_tiles")
 writeOGR(obj=   ex_tile,
          dsn=   paste(tile_dir,export_name,".kml",sep=""),
          layer= export_name,
@@ -53,7 +64,7 @@ writeOGR(obj=   ex_tile,
 
 ##############################################################################
 ### CONVERT TO A FUSION TABLE
-### For example:    18vyDGQEYPGJgT_oXmTfATGsxW8_9xWkpOMdUBWfi
+### For example:    
 ##############################################################################
 
 ### Export ALL TILES as KML
@@ -68,5 +79,5 @@ writeOGR(obj=sqr_df_selected,
 
 ##############################################################################
 ### CONVERT TO A FUSION TABLE
-### For example:    1pYQIgheGU7iyBRqgVB1MWkTXjHblK-aroZDi1Lux
+### For example:    
 ##############################################################################
