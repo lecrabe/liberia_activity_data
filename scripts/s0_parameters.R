@@ -40,7 +40,7 @@ packages(stringr)
 packages(tidyr)
 
 ## Set the working directory
-rootdir       <- "~/liberia_activity_data_2018/"
+rootdir       <- "~/liberia_activity_data/"
 
 ## Set two downloads directories
 gfcstore_dir  <- "~/downloads/gfc_2016/"

@@ -62,6 +62,17 @@ writeOGR(obj=   ex_tile,
          driver = "KML",
          overwrite_layer = T)
 
+### Select and Export one Tile as KML 
+one_tile <- tiles[tiles$tileID == 205,]
+plot(one_tile,add=T,col="green")
+
+export_name <- paste0("one_tile")
+writeOGR(obj=   one_tile,
+         dsn=   paste(tile_dir,export_name,".kml",sep=""),
+         layer= export_name,
+         driver = "KML",
+         overwrite_layer = T)
+
 ##############################################################################
 ### CONVERT TO A FUSION TABLE
 ### For example:    
