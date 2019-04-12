@@ -28,7 +28,7 @@ In SEPAL, open a terminal and start an instance #4
 
 Clone the repository with the following command:
 
-``` git clone https://github.com/lecrabe/liberia_activity_data_2018.git ```
+``` git clone https://github.com/lecrabe/liberia_activity_data.git ```
 
 Open another SEPAL tab, go to Process/rstudio and under the clone directory, open and ``` source()``` the following scripts:
 

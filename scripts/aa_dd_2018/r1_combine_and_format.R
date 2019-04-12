@@ -11,7 +11,7 @@
 ## You only need to run the r0_download_data.R script once
 
 ## read data
-source('~/liberia_activity_data_2018/scripts/s0_parameters.R')
+source('~/liberia_activity_data/scripts/s0_parameters.R')
 originalsampledata <- paste0(samp_dir,'all_sample_points.csv')
 priorityareasfile <- paste0(pl_dir,'priority_areas_20181014.tif')
 ### READ RECHECKED DATA ## AMENDED 07/11/2018
