@@ -51,7 +51,8 @@ countrycode <- "LBR"
 
 ## Go to the root directory
 setwd(rootdir)
-rootdir <- paste0(getwd(),"/")
+rootdir  <- paste0(getwd(),"/")
+username <- unlist(strsplit(rootdir,"/"))[3]
 
 scriptdir<- paste0(rootdir,"scripts/")
 data_dir <- paste0(rootdir,"data/")

@@ -6,7 +6,7 @@
 ####################################################################################################
 ####################################################################################################
 
-### Select a vector from location of another vector
+### GET COUNTRY BOUNDARIES FROM THE WWW.GADM.ORG DATASET
 aoi   <- getData('GADM',
                  path=gadm_dir, 
                  country= countrycode, 
@@ -41,7 +41,7 @@ plot(aoi_geo,add=T,border="blue")
 
 
 ### Call the pilot sites file
-df <- read.csv(paste0(data_dir,"Liberia_Bfast_sample_locations.csv"))
+df <- read.csv(paste0(tile_dir,"Liberia_Bfast_sample_locations.csv"))
 spdf <- SpatialPointsDataFrame(df[,c("plot_location_x","plot_location_y")],
                                data = df,
                                proj4string = CRS('+init=epsg:32629')
@@ -92,3 +92,18 @@ writeOGR(obj=sqr_df_selected,
 ### CONVERT TO A FUSION TABLE
 ### For example:    
 ##############################################################################
+
+### Call the extra sites
+extra_tiles <- readOGR(paste0(tile_dir,"extra_tiles.kml"))
+
+list_tiles  <- c(extra_tiles@data[,"tileID"],ex_tile@data[,"tileID"])
+
+### Read the list of usernames
+users     <- read.csv(paste0(data_dir,"workshop_list_20190415.csv"))
+
+df        <- data.frame(cbind(list_tiles,users$username))
+names(df) <- c("tileID","username")
+df$tileID <- as.numeric(df$tileID)
+
+my_tiles <- tiles[tiles$tileID %in% df[df$username == username,"tileID"],]
+plot(my_tiles,add=T,col="yellow")
