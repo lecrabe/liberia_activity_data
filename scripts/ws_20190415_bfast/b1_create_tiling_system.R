@@ -64,7 +64,6 @@ writeOGR(obj=   ex_tile,
 
 ### Select and Export one Tile as KML 
 one_tile <- tiles[tiles$tileID == 205,]
-plot(one_tile,add=T,col="green")
 
 export_name <- paste0("one_tile")
 writeOGR(obj=   one_tile,
@@ -96,14 +95,26 @@ writeOGR(obj=sqr_df_selected,
 ### Call the extra sites
 extra_tiles <- readOGR(paste0(tile_dir,"extra_tiles.kml"))
 
+### Append the final list of tiles
 list_tiles  <- c(extra_tiles@data[,"tileID"],ex_tile@data[,"tileID"])
 
 ### Read the list of usernames
 users     <- read.csv(paste0(data_dir,"workshop_list_20190415.csv"))
 
+### Assign each tile with a username
 df        <- data.frame(cbind(list_tiles,users$username))
 names(df) <- c("tileID","username")
 df$tileID <- as.numeric(df$tileID)
 
+### Create a final subset corresponding to your username
 my_tiles <- tiles[tiles$tileID %in% df[df$username == username,"tileID"],]
 plot(my_tiles,add=T,col="yellow")
+
+### Export the final subset
+export_name <- paste0("tiles_",username)
+
+writeOGR(obj=my_tiles,
+         dsn=paste(tile_dir,export_name,".kml",sep=""),
+         layer= export_name,
+         driver = "KML",
+         overwrite_layer = T)
