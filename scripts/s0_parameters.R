@@ -24,7 +24,7 @@ packages <- function(x){
 packages(Hmisc)
 packages(RCurl)
 packages(hexbin)
-packages(gfcanalysis)
+#packages(gfcanalysis)
 
 ### Load necessary packages
 packages(raster)
