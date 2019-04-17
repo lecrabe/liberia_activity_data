@@ -85,7 +85,7 @@ This script is the R script version of the SAEA application in SEPAL
 ##### r3_drivers_analysis.R
 This script outputs some figures for drivers of deforestation and forest degradation.
 
-## Update of the land cover map (2015-2018)
+## Change detection using the BFAST algorithm
 
 The land cover map developed for the year 2015 is complemented with a detailed mapping of the main commodity farms and combined with land cover changes obtained from analysis of dense time series of satellite imagery using the BFAST algorithm developed by the University of Wageningen.
 
