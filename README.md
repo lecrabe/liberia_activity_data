@@ -1,9 +1,11 @@
 ### Automatic processing chain for activity data in Liberia
 The material on this repo has been developed to run inside SEPAL (https://sepal.io)
 
-The aim of the processing chain is to combine GFC dataset, with an agricultural commodity layer and a priority landscape layer to produce a deforestation and degradation map.
+The aim of the processing chain is to develop activity data for Liberia REDD+ process
 
-### Characteristics of the output
+## Characteristics of the FREL 
+The FREL combine GFC dataset, with an agricultural commodity layer and a priority landscape layer to produce a deforestation and degradation map.
+
 - Period for 2007-2016
 
 - 30% canopy cover threshold for the forest definition
@@ -30,7 +32,7 @@ Clone the repository with the following command:
 
 ``` git clone https://github.com/lecrabe/liberia_activity_data.git ```
 
-Open another SEPAL tab, go to Process/rstudio and under the clone directory, open and ``` source()``` the following scripts:
+Open another SEPAL tab, go to Process/rstudio and under the clone directory, open and ``` source()``` the following scripts under `ws_20180301`:
 
 ##### s0_parameters.R
 This script needs to be run EVERY TIME your R session is restarted. 
@@ -62,7 +64,7 @@ The final map is cropped to the boundaries of the priority landscapes:
 
 ![Alt text](/docs/dd_map_cropped_20181014.png?raw=true "PL crop")
 
-##### Accuracy assessment of the maps
+## Accuracy assessment of the maps
 Each map (priority landscape 1 and 2, rest of the country) is sampled using the SAE-design tool inside SEPAL
 
 The specific instructions to run the aa_xxx scripts are available in attachment
