@@ -89,4 +89,11 @@ This script outputs some figures for drivers of deforestation and forest degrada
 
 The land cover map developed for the year 2015 is complemented with a detailed mapping of the main commodity farms and combined with land cover changes obtained from analysis of dense time series of satellite imagery using the BFAST algorithm developed by the University of Wageningen.
 
+Example of urban extension on humid zones in the vicinity of Monrovia:
+
+![Alt text](/docs/bfast_swamp_monrovia.png?raw=true "Swamps")
+
+Example of mining in the North of the country:
+
+![Alt text](/docs/bfast_mining.png?raw=true "Mining")
 Instructions are available under the `docs/sop/` folder
