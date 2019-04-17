@@ -92,6 +92,9 @@ writeOGR(obj=sqr_df_selected,
 ### For example:    
 ##############################################################################
 
+##########################################
+################## PILOT SITES (2tiles per person)
+
 ### Call the extra sites
 extra_tiles <- readOGR(paste0(tile_dir,"extra_tiles.kml"))
 
@@ -112,6 +115,30 @@ plot(my_tiles,add=T,col="yellow")
 
 ### Export the final subset
 export_name <- paste0("tiles_",username)
+
+writeOGR(obj=my_tiles,
+         dsn=paste(tile_dir,export_name,".kml",sep=""),
+         layer= export_name,
+         driver = "KML",
+         overwrite_layer = T)
+
+
+
+##########################################
+################## ALL TILES IN COUNTRY
+
+### Assign each tile with a username
+df        <- data.frame(cbind(tiles@data[,"tileID"],users$username))
+names(df) <- c("tileID","username")
+df$tileID <- as.numeric(df$tileID)
+
+### Create a final subset corresponding to your username
+my_tiles <- tiles[tiles$tileID %in% df[df$username == username,"tileID"],]
+plot(my_tiles,add=T,col="black")
+length(my_tiles)
+
+### Export the final subset
+export_name <- paste0("national_scale_",length(my_tiles),"_tiles_",username)
 
 writeOGR(obj=my_tiles,
          dsn=paste(tile_dir,export_name,".kml",sep=""),
