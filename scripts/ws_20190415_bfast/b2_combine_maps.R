@@ -111,26 +111,26 @@ write.table(pct,paste0(dd_dir,"color_table.txt"),row.names = F,col.names = F,quo
 ################################################################################
 system(sprintf("(echo %s) | oft-addpct.py %s %s",
                paste0(dd_dir,"color_table.txt"),
-               paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_country.tif"),
-               paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"pct.tif")
+               paste0(lc_dir,"tmp_fnf_2018.tif"),
+               paste0(lc_dir,"tmp_fnf_pct_2018.tif")
 ))
 
 ################################################################################
 #################### COMPRESS
 ################################################################################
 system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
-               paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"pct.tif"),
-               paste0(dd_dir,"dd_map_0716_gt",gfc_threshold,"_utm_20181014.tif")
+               paste0(lc_dir,"tmp_fnf_pct_2018.tif"),
+               paste0(lc_dir,"fnf_2018.tif")
  ))
 
 
  
-# ################################################################################
-# ####################  CLEAN
-# ################################################################################
-# system(sprintf("rm %s",
-#                paste0(dd_dir,"tmp*.tif")
-# ))
+################################################################################
+####################  CLEAN
+################################################################################
+system(sprintf("rm %s",
+               paste0(lc_dir,"tmp*.tif")
+))
 
 (time_decision_tree <- Sys.time() - time_start)
 
