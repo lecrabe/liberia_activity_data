@@ -96,7 +96,9 @@ dir.create(rdsdir,showWarnings = F)
 # dir.create(esa_dir,showWarnings = F)
 # dir.create(lsat_dir,showWarnings = F)
 # dir.create(seg_dir,showWarnings = F)
- dir.create(tile_dir,showWarnings = F)
+dir.create(tile_dir,showWarnings = F)
+dir.create(bfst_dir,showWarnings = F)
+  
 
 #################### FOREST DEFINITION
 gfc_threshold <- 30 # in % Tree cover
