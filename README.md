@@ -1,7 +1,7 @@
-### Automatic processing chain for activity data in Liberia
+# Processing chain for the generation activity data in Liberia
 The material on this repo has been developed to run inside SEPAL (https://sepal.io)
 
-The aim of the processing chain is to develop activity data for Liberia REDD+ process
+The aim of the processing chain is to develop activity data for the Liberia REDD+ process
 
 ## Characteristics of the FREL 
 The FREL combine GFC dataset, with an agricultural commodity layer and a priority landscape layer to produce a deforestation and degradation map.
@@ -83,4 +83,10 @@ If the reference data is updated this script can be rerun
 This script is the R script version of the SAEA application in SEPAL 
 
 ##### r3_drivers_analysis.R
-This script outputs some figures for drivers of deforestation and forest degradation. 
+This script outputs some figures for drivers of deforestation and forest degradation.
+
+## Update of the land cover map (2015-2018)
+
+The land cover map developed for the year 2015 is complemented with a detailed mapping of the main commodity farms and combined with land cover changes obtained from analysis of dense time series of satellite imagery using the BFAST algorithm developed by the University of Wageningen.
+
+Instructions are available under the `docs/sop/` folder
