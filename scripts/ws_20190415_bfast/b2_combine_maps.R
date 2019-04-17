@@ -57,6 +57,8 @@ system(sprintf("gdalwarp -co COMPRESS=LZW -t_srs \"%s\" -te %s %s %s %s -tr %s %
 ####### COMBINE LAYERS
 ####################################################################################
 
+
+############################ CREATE THE LOSS LAYER
 system(sprintf("gdal_calc.py -A %s -B %s -C %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
                paste0(lc_dir,"lc_2015.tif"),
                paste0(bfst_dir,"lcc_map.tif"),
@@ -65,6 +67,7 @@ system(sprintf("gdal_calc.py -A %s -B %s -C %s --co COMPRESS=LZW --outfile=%s --
                paste0("((B==4)+(B==5))*(A>=1)*(A<=4)*(C==0)")
 ))
 
+############################ CREATE THE GAIN LAYER
 system(sprintf("gdal_calc.py -A %s -B %s -C %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
                paste0(lc_dir,"lc_2015.tif"),
                paste0(bfst_dir,"lcc_map.tif"),
@@ -73,10 +76,11 @@ system(sprintf("gdal_calc.py -A %s -B %s -C %s --co COMPRESS=LZW --outfile=%s --
                paste0("((B==8)+(B==9))*((A==14)+(A==16))*(C==0)")
 ))
 
+############################ CREATE THE FOREST NON FOREST MASK
 system(sprintf("gdal_calc.py -A %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
                paste0(lc_dir,"lc_2015.tif"),
                paste0(lc_dir,"tmp_fnf_2015.tif"),
-               paste0("(A>=1)*(A<=4)*1+(A>4)*2")
+               paste0("(A>=1)*(A<=4)*1+(A>4)*(A<14)*2+(A==14)*3+(A>14)*2")
 ))
 
 system(sprintf("gdal_calc.py -A %s -B %s -C %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
@@ -88,131 +92,39 @@ system(sprintf("gdal_calc.py -A %s -B %s -C %s --co COMPRESS=LZW --outfile=%s --
 ))
 
 
-# #################### CREATE A COLOR TABLE FOR THE OUTPUT MAP
-# my_classes <- c(0,1,2,3,4,11)
-# my_colors  <- col2rgb(c("black","grey","darkgreen","red","orange","purple"))
-# 
-# pct <- data.frame(cbind(my_classes,
-#                         my_colors[1,],
-#                         my_colors[2,],
-#                         my_colors[3,]))
-# 
-# write.table(pct,paste0(dd_dir,"color_table.txt"),row.names = F,col.names = F,quote = F)
-# 
-# 
-# 
-# 
-# ################################################################################
-# #################### Add pseudo color table to result
-# ################################################################################
-# system(sprintf("(echo %s) | oft-addpct.py %s %s",
-#                paste0(dd_dir,"color_table.txt"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_country.tif"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"pct.tif")
-# ))
-# 
-# ################################################################################
-# #################### COMPRESS
-# ################################################################################
-# system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"pct.tif"),
-#                paste0(dd_dir,"dd_map_0716_gt",gfc_threshold,"_utm_20181014.tif")
-# ))
-# 
-# 
-# 
-# #############################################################
-# ### ADAPT PRIORITY LANDSCAPE MAPS FOR CROPPING
-# #############################################################
-# pls <- readOGR(paste0(pl_dir,"priority_areas_20181014.shp"))
-# proj4string(pls)
-# head(pls)
-# 
-# #################### RASTERIZE THE PRIORITY LANDSCAPE
-# system(sprintf("python %s/oft-rasterize_attr.py -v %s -i %s -o %s -a %s",
-#                scriptdir,
-#                paste0(pl_dir,"priority_areas_20181014.shp"),
-#                paste0(dd_dir,"dd_map_0716_gt",gfc_threshold,"_utm_20181014.tif"),
-#                paste0(pl_dir,"priority_areas_20181014.tif"),
-#                "id"
-# ))
-# 
-# #################### MASK MAP FOR PRIORITY LANDSCAPE 1
-# system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-#                paste0(dd_dir,"dd_map_0716_gt",gfc_threshold,"_utm_20181014.tif"),
-#                paste0(pl_dir,"priority_areas_20181014.tif"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_pl1.tif"),
-#                paste0("(B==1)*A")
-# ))
-# 
-# #################### MASK MAP FOR PRIORITY LANDSCAPE 2
-# system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-#                paste0(dd_dir,"dd_map_0716_gt",gfc_threshold,"_utm_20181014.tif"),
-#                paste0(pl_dir,"priority_areas_20181014.tif"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_pl2.tif"),
-#                paste0("(B==2)*A")
-# ))
-# 
-# #################### MASK MAP FOR NON PRIORITY LANDSCAPE
-# system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-#                paste0(dd_dir,"dd_map_0716_gt",gfc_threshold,"_utm_20181014.tif"),
-#                paste0(pl_dir,"priority_areas_20181014.tif"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_npl.tif"),
-#                paste0("(B==0)*A")
-# ))
-# 
-# 
-# ################################################################################
-# #################### Add pseudo color table to result
-# ################################################################################
-# system(sprintf("(echo %s) | oft-addpct.py %s %s",
-#                paste0(dd_dir,"color_table.txt"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_pl1.tif"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_pl1_pct.tif")
-# ))
-# 
-# ################################################################################
-# #################### COMPRESS
-# ################################################################################
-# system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_pl1_pct.tif"),
-#                paste0(dd_dir,"dd_map_0716_gt",gfc_threshold,"_utm_pl1_20181014.tif")
-# ))
-# 
-# ################################################################################
-# #################### Add pseudo color table to result
-# ################################################################################
-# system(sprintf("(echo %s) | oft-addpct.py %s %s",
-#                paste0(dd_dir,"color_table.txt"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_pl2.tif"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_pl2_pct.tif")
-# ))
-# 
-# ################################################################################
-# #################### COMPRESS
-# ################################################################################
-# system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_pl2_pct.tif"),
-#                paste0(dd_dir,"dd_map_0716_gt",gfc_threshold,"_utm_pl2_20181014.tif")
-# ))
-# 
-# ################################################################################
-# #################### Add pseudo color table to result
-# ################################################################################
-# system(sprintf("(echo %s) | oft-addpct.py %s %s",
-#                paste0(dd_dir,"color_table.txt"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_npl.tif"),
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_npl_pct.tif")
-# ))
-# 
-# ################################################################################
-# #################### COMPRESS
-# ################################################################################
-# system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
-#                paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_npl_pct.tif"),
-#                paste0(dd_dir,"dd_map_0716_gt",gfc_threshold,"_utm_npl_20181014.tif")
-# ))
-# 
+#################### CREATE A COLOR TABLE FOR THE OUTPUT MAP
+my_classes <- c(0,1,2,3)
+my_colors  <- col2rgb(c("black","darkgreen","grey","blue"))
+
+pct <- data.frame(cbind(my_classes,
+                        my_colors[1,],
+                        my_colors[2,],
+                        my_colors[3,]))
+
+write.table(pct,paste0(dd_dir,"color_table.txt"),row.names = F,col.names = F,quote = F)
+
+
+
+
+################################################################################
+#################### Add pseudo color table to result
+################################################################################
+system(sprintf("(echo %s) | oft-addpct.py %s %s",
+               paste0(dd_dir,"color_table.txt"),
+               paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"_utm_country.tif"),
+               paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"pct.tif")
+))
+
+################################################################################
+#################### COMPRESS
+################################################################################
+system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
+               paste0(dd_dir,"tmp_dd_map_0716_gt",gfc_threshold,"pct.tif"),
+               paste0(dd_dir,"dd_map_0716_gt",gfc_threshold,"_utm_20181014.tif")
+ ))
+
+
+ 
 # ################################################################################
 # ####################  CLEAN
 # ################################################################################
