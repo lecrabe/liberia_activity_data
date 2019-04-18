@@ -100,6 +100,7 @@ system(sprintf("gdal_calc.py -A %s -B %s -C %s --co COMPRESS=LZW --outfile=%s --
 ))
 
 
+
 #################### CREATE A COLOR TABLE FOR THE OUTPUT MAP
 my_classes <- c(0,1,2,3)
 my_colors  <- col2rgb(c("black","darkgreen","grey","blue"))
@@ -132,7 +133,14 @@ system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
  ))
 
 
- 
+################## PREPARE OUTPUT FOR MSPA
+
+system(sprintf("gdal_calc.py -A %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
+               paste0(lc_dir,"fnf_2018.tif"),
+               paste0(lc_dir,"mspa_2018.tif"),
+               paste0("(A==1)*2+(A>1)*1")
+))
+
 ################################################################################
 ####################  CLEAN
 ################################################################################
