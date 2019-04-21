@@ -77,14 +77,6 @@ writeOGR(obj=   one_tile,
 ### For example:    
 ##############################################################################
 
-### Export ALL TILES as KML
-export_name <- paste0("tiling_system_all")
-
-writeOGR(obj=sqr_df_selected,
-         dsn=paste(tile_dir,export_name,".kml",sep=""),
-         layer= export_name,
-         driver = "KML",
-         overwrite_layer = T)
 
 
 ##############################################################################
@@ -132,16 +124,44 @@ df        <- data.frame(cbind(tiles@data[,"tileID"],users$username))
 names(df) <- c("tileID","username")
 df$tileID <- as.numeric(df$tileID)
 
-### Create a final subset corresponding to your username
-my_tiles <- tiles[tiles$tileID %in% df[df$username == username,"tileID"],]
-plot(my_tiles,add=T,col="black")
-length(my_tiles)
+tiles@data <- df 
 
-### Export the final subset
-export_name <- paste0("national_scale_",length(my_tiles),"_tiles_",username)
+for(username in users$username){
+  ### Create a final subset corresponding to your username
+  my_tiles <- tiles[tiles$tileID %in% df[df$username == username,"tileID"],]
+  plot(my_tiles,add=T,col="black")
+  length(my_tiles)
+  
+  ### Export the final subset
+  export_name <- paste0("national_scale_",length(my_tiles),"_tiles_",username)
+  
+  writeOGR(obj=my_tiles,
+           dsn=paste(tile_dir,export_name,".kml",sep=""),
+           layer= export_name,
+           driver = "KML",
+           overwrite_layer = T)
+  
+}
 
-writeOGR(obj=my_tiles,
+### Export ALL TILES as KML
+export_name <- paste0("tiling_system_all")
+
+writeOGR(obj=tiles,
          dsn=paste(tile_dir,export_name,".kml",sep=""),
          layer= export_name,
          driver = "KML",
          overwrite_layer = T)
+
+### Export MISSING TILES as KML
+missing_ids <- read.table(paste0(data_dir,"missing_tiles_20190418.txt"),header = T)
+
+missing_tiles <- tiles[tiles$tileID %in% missing_ids$tileID,]
+
+export_name <- paste0("missing_tiles")
+
+writeOGR(obj=missing_tiles,
+         dsn=paste(tile_dir,export_name,".kml",sep=""),
+         layer= export_name,
+         driver = "KML",
+         overwrite_layer = T)
+
