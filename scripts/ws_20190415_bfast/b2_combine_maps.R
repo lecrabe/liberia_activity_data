@@ -287,29 +287,6 @@ system(sprintf("gdal_calc.py -A %s -B %s -C %s -D %s -E %s -F %s -G %s --co COMP
 gdalinfo( paste0(lc_dir,  'lc_2018.tif' ),mm=T)
 
 
-################################################################################
-######## REFORESTATION
-#################### reclass only high magnitude gain mask
-system(sprintf("gdal_calc.py -A %s --type=Byte --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
-               outputfile,
-               paste0(thres_dir,"/","tmp_hi_mag_gain.tif"),
-               paste0("(A==9)")
-))
-
-#################### SIEVE TO THE MMU
-system(sprintf("gdal_sieve.py -st %s %s %s ",
-               mmu,
-               paste0(thres_dir,"/","tmp_hi_mag_gain.tif"),
-               paste0(thres_dir,  "tmp_",substr(basename(bfastout), 1, nchar(basename(bfastout))-4),'_gain_threshold_sieve.tif')
-               
-))
-
-## Compress sieved
-system(sprintf("gdal_translate -ot byte -co COMPRESS=LZW %s %s",
-               paste0(thres_dir,  "tmp_",substr(basename(bfastout), 1, nchar(basename(bfastout))-4),'_gain_threshold_sieve.tif'),
-               paste0(thres_dir,  substr(basename(bfastout), 1, nchar(basename(bfastout))-4),'_gain_threshold_sieve.tif')
-               
-))
 
 # #################### DIFFERENCE BETWEEN SIEVED AND ORIGINAL
 # system(sprintf("gdal_calc.py -A %s -B %s --co COMPRESS=LZW --outfile=%s --calc=\"%s\"",
