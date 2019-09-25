@@ -167,6 +167,9 @@ system(sprintf("gdal_translate -ot Byte -co COMPRESS=LZW %s %s",
 pls <- readOGR(paste0(pl_dir,"priority_areas_20190925.shp"))
 proj4string(pls)
 head(pls)
+pls@data$Id <- 1:2
+names(pls@data)[1] <- "id"
+writeOGR(pls,paste0(pl_dir,"priority_areas_20190925.shp"),"priority_areas_20190925","ESRI Shapefile",overwrite_layer = T)
 
 #################### RASTERIZE THE PRIORITY LANDSCAPE
 system(sprintf("python %s/oft-rasterize_attr.py -v %s -i %s -o %s -a %s",
