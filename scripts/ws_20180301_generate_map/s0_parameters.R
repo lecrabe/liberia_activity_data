@@ -2,7 +2,9 @@
 ####################################################################################################
 ## Set environment variables
 ## Contact remi.dannunzio@fao.org 
+## updated by: yelena.finegold@fao.org
 ## 2018/09/07
+## updated: 2019/10/17
 ####################################################################################################
 ####################################################################################################
 
@@ -38,17 +40,21 @@ packages(reshape2)
 packages(survey)
 packages(stringr)
 packages(tidyr)
+packages(devtools)
 
 ## Set the working directory
 rootdir       <- "~/liberia_activity_data/"
 
 ## Set two downloads directories
-gfcstore_dir  <- "~/downloads/gfc_2016/"
+gfcstore_dir  <- paste0('/',paste0(strsplit(getwd(),'/')[[1]][2:3],collapse = '/'),"/downloads/gfc/",countrycode,'/')
 #esastore_dir  <- "~/downloads/ESA_2016/"
 
 ## Set the country code
 countrycode <- "LBR"
 
+## years to assess
+startyear <- 2017
+endyear <- 2018
 ## Go to the root directory
 setwd(rootdir)
 rootdir <- paste0(getwd(),"/")
@@ -92,7 +98,7 @@ dir.create(rdsdir,showWarnings = F)
 # dir.create(esa_dir,showWarnings = F)
 # dir.create(lsat_dir,showWarnings = F)
 # dir.create(seg_dir,showWarnings = F)
- dir.create(tile_dir,showWarnings = F)
+dir.create(tile_dir,showWarnings = F)
 
 #################### FOREST DEFINITION
 gfc_threshold <- 30 # in % Tree cover
@@ -102,11 +108,11 @@ mmu <- 12           # in pixels
 gfc_tc       <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_tc.tif")
 gfc_ly       <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_ly.tif")
 gfc_gn       <- paste0(gfc_dir,"gfc_gain.tif")
-gfc_14       <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_F_2014.tif")
-gfc_04       <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_F_2000.tif")
-gfc_mp       <- paste0(gfc_dir,"gfc_map_2000_2014_th",gfc_threshold,".tif")
-gfc_mp_crop  <- paste0(gfc_dir,"gfc_map_2000_2014_th",gfc_threshold,"_crop.tif")
-gfc_mp_sub   <- paste0(gfc_dir,"gfc_map_2000_2014_th",gfc_threshold,"_sub_crop.tif")
+gfc_end      <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_F_",endyear,".tif")
+gfc_start    <- paste0(gfc_dir,"gfc_th",gfc_threshold,"_F_",startyear,".tif")
+gfc_mp       <- paste0(gfc_dir,"gfc_map_",startyear,"_",endyear,"_th",gfc_threshold,".tif")
+gfc_mp_crop  <- paste0(gfc_dir,"gfc_map_",startyear,"_",endyear,"_th",gfc_threshold,"_crop.tif")
+gfc_mp_sub   <- paste0(gfc_dir,"gfc_map_",startyear,"_",endyear,"_th",gfc_threshold,"_sub_crop.tif")
 
 ############ CREATE A FUNCTION TO GENERATE REGULAR GRIDS
 generate_grid <- function(aoi,size){
