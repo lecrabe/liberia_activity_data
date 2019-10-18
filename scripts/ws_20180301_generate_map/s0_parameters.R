@@ -82,7 +82,7 @@ tile_dir <- paste0(rootdir,"data/tiling/")
 
 dir.create(data_dir,showWarnings = F)
 dir.create(gadm_dir,showWarnings = F)
-dir.create(gfcstore_dir,showWarnings = F)
+dir.create(gfcstore_dir, recursive = T, showWarnings = F)
 dir.create(gfc_dir,showWarnings = F)
 dir.create(dd_dir,showWarnings = F)
 dir.create(lc_dir,showWarnings = F)

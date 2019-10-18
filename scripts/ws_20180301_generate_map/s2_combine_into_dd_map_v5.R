@@ -39,7 +39,7 @@ download_tiles(tiles, gfcstore_dir)
 
 ### MERGE THE TILES TOGETHER, FOR EACH LAYER SEPARATELY and CLIP TO THE BOUNDING BOX OF THE COUNTRY
 prefix <- "Hansen_GFC-2018-v1.6_"
-tiles  <- list.files(gfcstore_dir,pattern = 'datamask')
+tiles  <- list.files(gfcstore_dir,pattern = paste0(prefix,'datamask'))
 tilesx <- substr(tiles,31,38)
 
 types <- c("treecover2000","lossyear","gain","datamask")
